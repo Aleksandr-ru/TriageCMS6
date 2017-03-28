@@ -1,0 +1,566 @@
+<!-- INCLUDE header.inc.html -->
+
+<script type="text/javascript" src="../scripts/jquery.insertAtCaret.js"></script>
+<script type="text/javascript" src="../scripts/jquery.tabby.js"></script>
+<script type="text/javascript" src="../editor/codemirror/js/codemirror.js"></script>
+<script type="text/javascript" src="../editor/tinymce/jscripts/tiny_mce/jquery.tinymce.js"></script>
+
+<div style="float: left; width: 75%;">
+
+<!-- BEGIN error -->
+<div class="error">
+    <strong>{ERROR_TITLE}</strong><br>
+    {ERROR_TEXT}
+</div>
+<!-- END error -->
+
+<!-- BEGIN warning -->
+<div class="warning">
+    <strong>{WARNING_TITLE}</strong><br>
+    {WARNING_TEXT}
+</div>
+<!-- END warning -->
+<!-- BEGIN notice -->
+<div class="notice">
+    <strong>{NOTICE_TITLE}</strong><br>
+    {NOTICE_TEXT}
+</div>
+<!-- END notice -->
+
+<link rel="stylesheet" type="text/css" href="templates/tabs.css">
+
+<script type="text/javascript">
+    var tinymce_base_url = '{TINYMCE_BASE_URL}';
+</script>
+<script type="text/javascript" src="js/tinymce_config.js"></script>
+
+<script type="text/javascript">
+<!--	
+    var use_tinymce = {USE_TINYMCE};
+    var use_codemirror = {USE_CODEMIRROR};
+    
+    var editorHTML;
+    var editorCSS;
+    var editorJS;
+    
+    
+    $(document).ready(function(){
+    	$("ul.tabs li a").click(function(){
+    		$("ul.tabs li").removeClass("selected");
+    		$(this).parents("li").addClass("selected");
+    		var index = $("ul.tabs li").index($(this).parents("li"));			
+    		$("div.tab").hide();
+    		$("div.tab").eq(index).show();
+            
+            $("#material_type").val($(this).attr("class"));
+                		
+            return false;
+    	});
+    
+    	//$("ul.tabs li:first a").click();
+        /*var a = window.location.href.split('#');
+		if(a[1] && $("a[name='"+a[1]+"']").html()) $("a[name='"+a[1]+"']").click();
+		else $("ul.tabs li:first a").click();
+        */        
+        $("#a_"+$("#material_type").val()).click();
+        
+        $("div.tab:last div.plugin").click(function(){            
+            var div = $(this);
+            var div_options = div.find("div.plugin_options");            
+            var chk = div.find("input.plugin_chk");
+            chk.attr("checked", "checked");
+            var material_id = parseInt('{MATERIAL_ID}');
+            var plugin_uid = chk.val();
+            
+            if(!div_options.is(":visible")) {
+                $("div.tab:last div.plugin").removeClass("hover");
+                $("div.tab:last div.plugin_options").stop().html("").hide();
+                div.addClass("hover");
+                if(!isNaN(material_id) && material_id > 0) {
+                    div_options.load("ajax/plugin_options.php", {plugin_uid: plugin_uid, material_id: material_id}, function(){
+                        div_options.slideDown("slow");
+                    });
+                }                
+            }
+        });
+        
+        $("div.tab:last div.hover").click();
+        
+        $("div.plugin_options li input[type=checkbox]").live("click", function(){
+            if($(this).is(":disabled")) return false;
+            if($(this).is(":checked")) { $(this).next("input, select").attr("disabled", "disabled"); }
+            else { $(this).next("input, select").removeAttr("disabled"); }
+        });
+        
+        /* editors init */
+        
+        if(use_tinymce) {
+            tinymce_config_advanced.cms_material_id = '{MATERIAL_ID}';
+            $("#tab_html textarea").tinymce(tinymce_config_advanced);            
+        }
+        else if(use_codemirror) {
+            
+            editorHTML = CodeMirror.fromTextArea( $("#tab_html textarea").wrap('<div class="codeBorder"></div>').get(0) , {                
+                parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
+                stylesheet: ["../editor/codemirror/css/xmlcolors.css", "../editor/codemirror/css/jscolors.css", "../editor/codemirror/css/csscolors.css"],
+                path: "../editor/codemirror/js/"   
+            });            
+        }
+        else {
+            $("#tab_html textarea").tabby();
+        }
+        
+        if(use_codemirror) {
+            
+            editorTEXT = CodeMirror.fromTextArea( $("#tab_text textarea").wrap('<div class="codeBorder"></div>').get(0) , {                
+                parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
+                stylesheet: ["../editor/codemirror/css/xmlcolors.css", "../editor/codemirror/css/jscolors.css", "../editor/codemirror/css/csscolors.css"],
+                path: "../editor/codemirror/js/"   
+            });    
+            
+            editorCSS = CodeMirror.fromTextArea( $("#tab_css textarea").wrap('<div class="codeBorder"></div>').get(0) , {                
+                parserfile: "parsecss.js",
+                stylesheet: "../editor/codemirror/css/csscolors.css",
+                path: "../editor/codemirror/js/"                             
+            });
+            
+            editorJS = CodeMirror.fromTextArea( $("#tab_javascript textarea").wrap('<div class="codeBorder"></div>').get(0) , {
+                parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
+                stylesheet: "../editor/codemirror/css/jscolors.css",
+                path: "../editor/codemirror/js/"                
+              });
+        }
+        else {
+            $("#tab_text textarea").tabby();
+            $("#tab_css textarea").tabby();
+            $("#tab_javascript textarea").tabby();
+        } 
+        
+        $("#delchk").change(function(){
+            var f = $(this).parents("form");
+            if($(this).is(":checked")) {
+                f.find("input[type=submit]:first").attr("disabled", "disabled");
+                f.find("input[type=submit]:last").val("Удалить материал");
+            } else {
+                f.find("input[type=submit]:first").removeAttr("disabled");
+                f.find("input[type=submit]:last").val("Сохранить материал");
+            }
+        });               
+	});
+//-->
+</script>
+
+<style type="text/css">
+    #hdr, #plugin_output { border: 1px solid #ccc; background: #EFEFEF; padding: 6px 12px; margin-bottom: 15px; }
+    
+    .hdr ul, .tab ul { margin: 0; padding: 0; }
+    .hdr li, .tab li { margin: 10px; padding: 0; list-style-type: none; }
+    .hdr li { clear: left; }
+    .hdr li label { float: left; width: 14em; margin-right: 1em; }
+    .tab li label { float: left; width: 35em; margin-right: 1em; }
+    .hdr li input[type=text], .hdr li select, .tab li input[type=text], .tab li select { width: 25em; }
+    .tab textarea { width: 100%; height: 20em; }
+        
+    .tabs a.text { background-image: url('images/icons/16/page_white_text.png'); background-position: 4px 4px; background-repeat: no-repeat; padding-left: 24px !important; }
+    .tabs a.html { background-image: url('images/icons/16/page_white_world.png'); background-position: 4px 4px; background-repeat: no-repeat; padding-left: 24px !important; }
+    .tabs a.css { background-image: url('images/icons/16/page_white_code.png'); background-position: 4px 4px; background-repeat: no-repeat; padding-left: 24px !important; }
+    .tabs a.javascript { background-image: url('images/icons/16/page_white_code_red.png'); background-position: 4px 4px; background-repeat: no-repeat; padding-left: 24px !important; }
+    .tabs a.plugin { background-image: url('images/icons/16/page_white_gear.png'); background-position: 4px 4px; background-repeat: no-repeat; padding-left: 24px !important; }
+    
+    .tab li { border: solid 1px transparent; padding: 2px; }
+    /*.tab li.hover { border: dashed 1px gray; background-color: #fafafa; }*/
+    
+    .textlinks a { font-weight: bold; text-decoration: none; border-bottom: dashed 1px black; }
+    .textlinks a:hover { color: #000; text-decoration: none; border-bottom-style: solid; }
+    
+    div.codeBorder { background-color: #fff; border: 1px inset; }
+    
+    #tab_plugin .plugin { padding: 4px; border: solid 1px transparent; }
+    #tab_plugin .plugin_desc { margin: 3px 0 3px 20px; }
+    #tab_plugin .plugin_options { display: none; }
+    #tab_plugin .hover { border: dashed 1px gray; background-color: #fafafa; }
+    #tab_plugin .disabled { color: gray; }
+    
+    .tab a { color: #000; text-decoration: none; border-bottom: dashed 1px #000; }
+    .tab a:hover { color: #000; text-decoration: none; border-bottom: solid 1px #000; }
+</style>
+
+<div style="margin: 5px; padding: 5px;">
+
+<form method="post" action="material_save.php">
+<input type="hidden" name="material_id" value="{MATERIAL_ID}">
+<input type="hidden" name="material_type" id="material_type" value="{MATERIAL_TYPE}">
+<input type="hidden" name="ref_plugin_uid" id="ref_plugin_uid" value="{REF_PLUGIN_UID}">
+<input type="hidden" name="page_id" value="{REF_PAGE_ID}">
+<input type="hidden" name="template_id" value="{REF_TMPL_ID}">
+<input type="hidden" name="block" value="{REF_BLOCK}">
+<input type="hidden" name="variable" value="{REF_VAR}">
+
+<div id="hdr" class="hdr">
+    <ul>
+        <li><label>ID материала:</label> <img src="images/icons/16/page_white.png" width="16" height="16" border="0" align="absmiddle"> <strong>{MATERIAL_ID_TEXT}</strong></li>
+        <li><label>Название:</label> <input type="text" name="material_name" value="{MATERIAL_NAME}"></li>
+        <li><label>Группа:</label> 
+            <select name="material_group">
+                {MATERIAL_GROUP_OPTIONS}
+            </select>
+        </li>
+        <li><label>Материал включен:</label> <input type="checkbox" name="active" id="active" value="1" {ACTIVE_CHK}> этот материал отображается на сайте</li>
+        <li><label>Группа доступа:</label> 
+            <select name="access_group">
+                {ACCESS_GROUP_OPTIONS}
+            </select>
+        </li>
+        <li>
+            <label>Удалить материал:</label> 
+            <input type="checkbox" name="delete" id="delchk" value="1" {DEL_DIS}> убрать материал со всех страниц и отправить в корзину
+        </li>
+    </ul>
+</div>
+
+<!-- BEGIN pluginoutput -->
+<div id="plugin_output" class="hdr">
+{PLUGIN_OUTPUT}
+</div>
+<!-- END pluginoutput -->
+
+<ul class="tabs">
+	<li><a class="text" name="text" href="#text" id="a_text">Текст</a></li>
+    <li><a class="html" name="html" href="#html" id="a_html">HTML</a></li>
+	<li><a class="css" name="css" href="#css" id="a_css">Стиль CSS</a></li>
+	<li><a class="javascript" name="javascript" href="#javascript" id="a_javascript">JavaScript</a></li>	
+    <li><a class="plugin" name="plugin" href="#plugin" id="a_plugin">Плагин</a></li>
+</ul>
+
+<div class="tab" id="tab_text">
+    <!-- pre>&lt;pre&gt;</pre -->
+    <textarea name="material_text">{MATERIAL_DATA_TEXT}</textarea>
+    <!-- pre>&lt;/pre&gt;</pre -->
+</div>
+
+<div class="tab" id="tab_html">
+    <textarea name="material_html">{MATERIAL_DATA_HTML}</textarea>
+</div>
+
+<div class="tab" id="tab_css">
+    <pre>&lt;style type=&quot;text/css&quot;&gt;</pre>
+    <textarea name="material_css">{MATERIAL_DATA_CSS}</textarea>
+    <pre>&lt;/style&gt;</pre>
+</div>
+
+<div class="tab" id="tab_javascript">
+    <pre>&lt;script type=&quot;text/javascript&quot;&gt;</pre>
+    <textarea name="material_javascript">{MATERIAL_DATA_JS}</textarea>
+    <pre>&lt;/script&gt;</pre>
+</div>
+
+<div class="tab" id="tab_plugin">
+    <div class="plugin">
+        <input class="plugin_chk" type="radio" name="material_plugin" value="" checked="checked" /> <b>(нет)</b>
+        <div class="plugin_desc">Этот материал не использует плагины</div>         
+    </div>
+    <!-- BEGIN plugin -->
+    <div class="plugin {PLUGIN_CLASS}">
+        <input class="plugin_chk" type="radio" name="material_plugin" value="{PLUGIN_UID}" {PLUGIN_CHK}> <b>{PLUGIN_TITLE}</b>
+        <div class="plugin_desc">{PLUGIN_DESC}</div> 
+        <div class="plugin_options">
+            <ul>
+                <!-- BEGIN options -->
+                <li><label>{OPTION_NAME}</label> {OPTION_VALUE}</li>
+                <!-- END options -->
+            </ul>
+        </div>
+    </div>
+    <!-- END plugin -->
+    <!-- BEGIN noplugin -->
+    <p><strong>В системе нет установленных плагинов.</strong></p>
+    <p>Попробуйте <a href="plugin_install.php">установить плагины</a>.</p>
+    <!-- END noplugin -->
+</div>
+
+<div style="padding: 10px; margin: 10px; text-align: center;">
+    <input type="submit" value="Применить изменения" class="bigbutton" name="apply" title="Сохранить материал и вернуться к редактированию" />
+    &nbsp;
+    <input type="submit" value="Сохранить материал" class="bigbutton" name="save" title="Сохранить материал и перейти к списку материалов" />
+</div>
+
+</form>
+
+</div>
+
+</div>
+<div style="float: left; width: 25%;">
+
+<style type="text/css">
+	#files { margin: 5px; padding: 5px; background-color: #eee; border: solid 1px #ccc; }
+    #files input[type=file] { width: 18em; }
+    #files input[type=text] { width: 14em; }
+    #files td.file { background: url('images/icons/16/brick.png') 4px 4px no-repeat; padding-left: 24px; }
+    #files td.image { background-image: url('images/icons/16/image.png'); }
+    
+    #files a.del img { background: url('images/icons/16/delete.png') center center no-repeat; }
+    .processing img { background-image: url('images/icons/16/ajax-loader.gif') !important; }
+    
+    #files .file a { color: #000; text-decoration: none; border-bottom: dashed 1px black; }
+    #files .file a:hover { color: #000; text-decoration: none; border-bottom: solid 1px black; }
+    
+    #library { margin-top: 10px }
+    #library_title { width: 17em; float: left; margin-left: 5px; padding: 4px; border: dashed 1px gray; background-color: #fafafa; overflow: hidden; }
+    #library_title a { color: #000; text-decoration: none; font-weight: bold; padding: 4px 20px 4px 0; background: url('images/icons/16/page_white_find.png') right 3px no-repeat; }    
+    
+    #files_loader { text-align: center; display: none; }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        /*$("#file_more").click(function(){
+            $("#file_inputs").find("div:last").clone().appendTo("#file_inputs");
+            $("#file_inputs").find("div:last input.clear_file").click();
+        });*/
+        
+        $("#upload_iframe").load(function(){
+            var data = $("#upload_iframe").contents().find('body').html();            
+            if(data != '') {   
+                /*
+                var regexp1 = /(<tr>(.|\n)+<\/tr>)/img;
+                var regexp2 = /^([^<]+)/m;
+                var tr = regexp1.exec(data);
+                var err = regexp2.exec(data); 
+                if(err && err[1] && err[1].trim() != '')
+                {
+                    alert(err[1]);
+                }
+                if(tr && tr[1] && tr[1].trim() != '')
+                {
+                    $("#files table").append(tr[1]);
+                }
+                */
+                alert(data);
+            }            
+           
+            $("#upload_form input.clear_file").click();
+            show_files( $("#upload_form_mat_id").val() );
+        });
+        
+        $("#files td.file a").live("click", function(){            
+            var index = $("ul.tabs li").index($("ul.tabs li.selected"));
+            var filename = $(this).text();
+            var href = $(this).attr("href");
+            var is_image = $(this).parents("td").hasClass("image");
+            var imgattrs = decodeURIComponent($(this).attr("imgattrs"));
+                        
+            if(index == 0){
+                $("#tab_text textarea").insertAtCaret(href);
+            }
+            else if(index == 1){
+                if(use_tinymce){
+                    var mce = $('#tab_html textarea').tinymce();
+                    var mce_selection = mce.selection.getContent();
+                    
+                    if(is_image){
+                        if(mce_selection) {
+                            mce.execCommand('mceReplaceContent',false,'<img src="'+href+'" '+imgattrs+'>');
+                        } else {
+                            mce.execCommand('mceInsertContent',false,'<img src="'+href+'" '+imgattrs+'>');
+                        }
+                    }
+                    else {
+                        if(mce_selection) {
+                            mce.execCommand('mceReplaceContent',false,'<a href="'+href+'">'+mce_selection+'</a>');
+                        } else {
+                            mce.execCommand('mceInsertContent',false,'<a href="'+href+'">'+filename+'</a>');
+                        }
+                    }
+                }
+                else if(use_codemirror){
+                    if(is_image){
+                        editorHTML.replaceSelection('<img src="'+href+'" '+imgattrs+'>');
+                    }
+                    else {
+                        editorHTML.replaceSelection('<a href="'+href+'">'+filename+'</a>');
+                    }
+                }
+                else{
+                    $("#tab_html textarea").insertAtCaret(href);
+                }
+            }
+            else if(index == 2){
+                if(use_codemirror){
+                    editorCSS.replaceSelection(href);
+                }
+                else{
+                    $("#tab_css textarea").insertAtCaret(href);
+                }
+            }
+            else if(index == 3){
+                if(use_codemirror){
+                    editorJS.replaceSelection(href);
+                }
+                else{
+                    $("#tab_css textarea").insertAtCaret(href);
+                }
+            }
+            
+            return false;
+        });
+        
+        $("#files a.del").live("click", function(){
+            if(!$(this).hasClass("processing") && confirm('Удалить файл?\nВсе ссылки на него перестанут работать.')){
+                var a = $(this);
+                var tr = $(this).parents("tr");
+                var file_id = $(this).attr("href").split("#");
+                file_id = file_id[1];
+                $(this).addClass("processing");
+                $.post("ajax/file_del.php", {file_id: file_id}, function(data){
+                    if(data.trim() != '') {
+                        alert(data);
+                        a.removeClass("processing");
+                    }
+                    else {
+                        tr.remove();
+                    }
+                });
+            }            
+            return false;
+        });
+        
+        $("#upload_form").submit(function(){
+            
+        });
+        
+        $("#upload_form input.clear_file").live("click", function(){
+            var html = $(this).parent().html();
+            $(this).parent().html(html);            
+        });
+        
+        $("#copy_form").submit(function(){
+                      
+            if(!$("#copy_form_url").val()) {
+                alert('Введите URL!');
+                return false;
+            }
+            
+            $("body").css("cursor", "wait");
+            var serialized = $(this).serializeArray();  
+            $.post($(this).attr("action"), serialized, function(data){
+                if(data != 'OK') { alert(data); }
+                else { 
+                    $("#copy_form_url").val('');
+                    show_files($("#copy_form_mat_id").val()); 
+                }
+                $("body").css("cursor", "");
+            });            
+            return false;
+        });
+        
+        $("#library_title a").click(function(){            
+            var mat = $(this).attr("href").split("#");
+            mat = mat[1];
+            var title = 'Выбор библиотеки';
+            var dlg = window.open('dialog.php?script=materials&callback=dlg_library&material_id='+mat+'&title='+title, 'mat', 'width=500, height=500'); 
+            dlg.focus();
+            return false;
+        });
+        
+        show_files({MATERIAL_ID});
+    });
+    
+    function dlg_library(btn, mat)
+    {       
+        switch(btn)
+        {
+            case 'DLG_OK':
+            {
+                if(mat.id && mat.id > 0)
+                {                    
+                    $("#library_title a").text(mat.name);
+                    $("#library_title a").attr("href", "#"+mat.id);
+                    $("#upload_form_mat_id").val(mat.id);
+                    $("#copy_form_mat_id").val(mat.id);
+                    show_files(mat.id);
+                }                
+            }
+            case 'DLG_CANCEL':
+            default:
+            
+        }
+        return true;
+    }
+    
+    function show_files(material_id)
+    {   
+        $("#upload_form input").attr("disabled", "disabled");
+        $("#copy_form input").attr("disabled", "disabled");
+        $("#files_loader").show().css("height", $("#files_table").height() > 31 ? $("#files_table").height() : 31);
+        $("#files_table").html('').load("ajax/files_table.php", {material_id: material_id}, function(){ 
+            $("#files_loader").hide();
+            $("#upload_form input").removeAttr("disabled"); 
+            $("#copy_form input").removeAttr("disabled");
+        });
+    }
+    
+</script>
+
+<div id="files">
+    
+    <!-- BEGIN no_library -->
+    <div style="text-align: center; line-height: 150%; margin: 40px 0;">
+        <img src="images/icons/48/warning.png" width="48" height="48" border="0">
+        <br>
+        <strong>Библиотека файлов не доступна<br>пока материал не сохранен.</strong>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#library").hide();
+            });
+        </script>
+    </div>
+    <!-- END no_library -->
+    
+    <div id="library">
+        <div style="float: left; padding: 4px;">Библиотека</div>
+        <div id="library_title"><a title="Выбрать другую библиотеку" href="#{MATERIAL_ID}">{MATERIAL_NAME}</a></div>
+        <div class="clear"></div>
+        <br>
+        
+        <div id="files_loader">
+            <img src="images/ajax-loader.gif" width="31" height="31" border="0">
+        </div>
+        <div id="files_table"></div>
+        
+        <form method="post" action="ajax/url2library.php" id="copy_form">
+        <input type="hidden" name="material_id" value="{MATERIAL_ID}" id="copy_form_mat_id">
+        <div style="margin: 10px 0;">
+            <strong>Загрузить файл в эту библиотеку с URL</strong>
+        </div>
+        <div style="margin: 10px 0;">
+            <input type="text" name="url" id="copy_form_url"><input type="submit" value="Загрузить">            
+        </div>
+        </form>
+        
+        <form method="post" action="ajax/file_upload.php" enctype="multipart/form-data" target="upload_iframe" id="upload_form">
+        <input type="hidden" name="material_id" value="{MATERIAL_ID}" id="upload_form_mat_id">
+        <div style="margin: 10px 0;">
+            <strong>Добавить файлы в эту библиотеку</strong>
+        </div>
+        <div id="file_inputs">
+            <span><input type="file" name="userfile[]" multiple><input type="button" value="X" title="Очистить" class="clear_file"></span>
+            <input type="submit" value="Загрузить">
+        </div>    
+        <!-- div style="text-align: center; margin: 10px 0;">
+            <input type="button" value="Еще файл" id="file_more"> <input type="submit" value="Загрузить">
+        </div -->
+        <p>* размер загружаемого файла не должен превышать {INI_MAX_FILEZIE};</p>
+        <p>** суммарный размер всех загружаемых файлов не должен превышать {INI_POST_MAXSIZE};</p>
+        <p>Для загрузки файлов большего размера пользуйтесь FTP.</p>
+        </form>
+        
+        <iframe name="upload_iframe" id="upload_iframe" style="display: none;"></iframe>
+    </div>
+</div>
+
+
+</div>
+<div class="clear"></div>
+
+
+<!-- INCLUDE footer.inc.html --> 

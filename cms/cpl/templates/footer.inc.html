@@ -1,0 +1,25 @@
+</div>
+
+<div id="bottom">
+ 
+    <div style="float: left; width: 50%;">
+        <a href="help.php">Triage CMS</a> версия {CMS_VERSION}
+        [
+        PHP <a href="phpinfo.php" onclick="window.open(this.href, 'phpinfo', 'width=800,height=800,menubar=no,scrollbars=yes,resizable=yes'); return false;">{PHP_VERSION}</a>
+        |
+        MySQL <a href="mysqlinfo.php" onclick="window.open(this.href, 'phpinfo', 'width=800,height=800,menubar=no,scrollbars=yes,resizable=yes'); return false;">{MYSQL_VERSION}</a>
+        ]    
+    </div>
+    
+    <div style="float: left; width: 50%; text-align: right;">
+        <form method="post" action="login.php">
+        <input type="hidden" name="cms_logoff" value="1">
+        Вы вошли как <strong>{CPLFOOTER_USER_NAME}</strong> <input type="image" src="images/icons/16/door_in.png" title="Выход" align="absmiddle">
+        </form>
+    </div>
+    
+    <div class="clear"></div>
+</div>
+
+</body>
+</html>

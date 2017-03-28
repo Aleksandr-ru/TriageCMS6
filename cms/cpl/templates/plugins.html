@@ -1,0 +1,139 @@
+<!-- INCLUDE header.inc.html -->
+
+<style type="text/css">
+    .plugins { list-style-type: none; margin: 0; padding: 0; }
+    .plugins li { background: url('images/icons/16/plugin.png') 4px 4px no-repeat; padding: 4px; padding-left: 24px; }
+    .plugins li.disabled { color: gray; }
+    .plugins li.selected { border: dotted 1px gray; background-color: #F4F4F4; }
+    .plugins div { margin: 5px 0; }
+    .plugins .plugin_title { font-weight: bold; margin-top: 0; }
+    .plugins a { color: blue; text-decoration: none; border-bottom: dashed 1px blue; margin-right: 20px; }
+    .plugins a:hover { border-bottom: solid 1px gray; color: black; }    
+    .plugins li.disabled a { color: gray; border-color: gray; }
+    .plugins li.disabled a.nastr { color: blue; }
+    .plugins a.disabled { color: gray !important; border: none; cursor: default; } 
+    
+    .plugin_options { }
+    .plugin_options ul { list-style-type: none; margin: 0; padding: 0; }
+    .plugin_options li { padding: 4px; }
+    .plugin_options label { float: left; width: 30em; }
+    .plugin_options input[type=text], .plugin_options select { width: 30em; }
+    .plugin_submit { text-align: center; margin: 10px; }
+    
+    #plugins_list {
+        overflow: auto;
+        overflow-y: auto;
+        overflow-x: visible;
+        max-height: 800px;
+    }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("a.disabled").click(function(){ return false; });
+        
+        if($(window).height() < $(document).height()) {
+            $("#plugins_list").css("max-height", function(){
+                var h = $(window).height() - $("#topmenu").height() - 120;
+                if(h < $(".plugin_options").height()) h = $(".plugin_options").height() - 16;
+                return h;
+            });
+        }
+        
+        $("#plugins_list").scrollTo($("#plugins_list ul li.selected"), "slow");
+    });
+</script>
+
+<div style="width: 40%; float: left;">
+    <div class="panel" id="plugins_list">
+        <!-- BEGIN noplugin -->
+        <p><strong>В системе нет установленных плагинов.</strong></p>
+        <!-- END noplugin -->
+        
+        <ul class="plugins">
+            <!-- BEGIN plugin -->
+            <li class="{PLUGIN_CLASS}">
+                <div class="plugin_title">{PLUGIN_TITLE}</div>
+                <div class="plugin_desc">{PLUGIN_DESC}</div>
+                <div class="plugin_desc">Управляется группой: {PLUGIN_GROUP}</div>
+                <div>
+                    <a class="nastr {SETTING_CLASS}" href="plugins.php?plugin_uid={PLUGIN_UID}">Настройки</a>
+                    <img src="images/icons/16/controller.png" border="0" width="16" height="16" align="absmiddle"> <a class="{CONTROL_CLASS}" href="plugin.php?plugin_uid={PLUGIN_UID}">Управление плагином</a>
+                </div>
+            </li>
+            <!-- END plugin -->
+        </ul>        
+    </div>
+    
+    <div style="padding: 0 10px;">
+    <!-- BEGIN can_install -->
+    <p class="textlinks"><img src="images/icons/16/package_add.png" border="0" width="16" height="16" align="absmiddle"> Вы можете установить новые плагины: <a href="plugin_install.php">доступно {AVAIL_PLUGINS_CNT}</a>.</p>
+    <!-- END can_install -->
+    <!-- BEGIN cant_install -->
+    <p>Вы не можете устанавливать новые плагины.</p>
+    <!-- END cant_install -->
+    </div>
+</div>
+<div style="width: 60%; float: left;">
+    <!-- BEGIN error -->
+    <div class="warning">
+        <strong>{ERROR_TITLE}</strong><br>
+        {ERROR_TEXT}
+    </div>
+    <!-- END error -->
+    
+    <!-- BEGIN warning -->
+    <div class="warning">
+        <strong>{WARNING_TITLE}</strong><br>
+        {WARNING_TEXT}
+    </div>
+    <!-- END warning -->
+    <!-- BEGIN notice -->
+    <div class="notice">
+        <strong>{NOTICE_TITLE}</strong><br>
+        {NOTICE_TEXT}
+    </div>
+    <!-- END notice -->
+       
+    <div class="plugin_options">
+        <form method="post" action="plugins_save.php">        
+            <!-- BEGIN settings -->
+            <input type="hidden" name="plugin_uid" value="{PLUGIN_UID2}">
+            <div class="panel">            
+                <p><strong>Настройки плагина &quot;{PLUGIN_TITLE2}&quot;</strong></p>
+                <ul>
+                    <!-- BEGIN options -->
+                    <li><label>{OPTION_NAME}:</label> {OPTION_VALUE}</li>
+                    <!-- END options -->
+                </ul>
+                <ul>
+                    <li>
+                        <label>Плагин включен:</label>
+                        <input type="checkbox" name="active" value="1" {ACTIVE_CHK}>
+                    </li>
+                    <li>
+                        <label>Управляется группой:</label>
+                        <select name="plugin_group">
+                            <option value="0">(не назначено)</option>
+                            {PLUGIN_GROUP_OPTIONS}
+                        </select> 
+                    </li>
+                    <li>
+                        <label>Восстановить начальные настройки (переустановить):</label>
+                        <input type="checkbox" name="reset_options" value="1">
+                    </li>
+                    <li>
+                        <label>Сбросить настройки для всех материалов:</label>
+                        <input type="checkbox" name="reset_materials" value="1">
+                    </li>
+                </ul>
+                <div class="clear"></div>
+            </div>
+            <!-- END settings -->
+            <div class="plugin_submit"><input class="bigbutton" type="submit" value="Сохранить настройки" {SETTINGS_DIS}></div>
+        </form>
+    </div>
+</div>
+<div class="clear"></div>
+
+<!-- INCLUDE footer.inc.html -->

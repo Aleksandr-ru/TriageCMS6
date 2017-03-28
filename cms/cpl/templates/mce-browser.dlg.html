@@ -1,0 +1,328 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<title>Triage CMS - {TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; Charset=utf-8">
+<meta http-equiv="Content-Language" content="ru">
+<meta name="Author" content="Rebel">
+
+<script type="text/javascript" src="../scripts/jquery.js"></script>
+<script type="text/javascript" src="../../cms/editor/tinymce/jscripts/tiny_mce/tiny_mce_popup.js"></script>
+
+<script type="text/javascript">
+    var images = new Array('jpg', 'jpeg', 'bmp', 'gif', 'png');
+    var type = '{TYPE}';
+    var material_id = 0;
+    
+    var FileBrowserDialogue = {
+        init : function () {
+            // Here goes your code for setting your custom things onLoad.
+            var win = tinyMCEPopup.getWindowArg("window");
+            var input = tinyMCEPopup.getWindowArg("input");            
+            //var res = tinyMCEPopup.getWindowArg("resizable");
+            //var inline = tinyMCEPopup.getWindowArg("inline");   
+            material_id = parseInt( tinyMCEPopup.getParam('cms_material_id') );      
+            if(material_id) {
+                show_files(material_id);
+                if( $("#selected_value").val().match(/^files\/[0-9]+\/.+/) ) {
+                    $("#li_lib a").click();
+                }
+                $("#upload_form_mat_id").val(material_id);
+                $("#copy_form_mat_id").val(material_id);                
+            } else {
+                $("#files_loader").hide();
+                $("#nolibrary").show();
+            }
+                  
+        },
+        mySubmit : function () {
+            var URL = $('#selected_value').val();
+            if(!URL) return false;
+            
+            var win = tinyMCEPopup.getWindowArg("window");
+            var input = tinyMCEPopup.getWindowArg("input");   
+            
+            if(type == 'image') {
+                var ext = URL.split('.').pop().toLowerCase();
+                if( ($.inArray(ext, images) < 0) && !confirm(URL + '\nне похоже на изображение, продолжить?')) {
+                    return false;
+                }
+            }
+    
+            // insert information now
+            win.document.getElementById(tinyMCEPopup.getWindowArg("input")).value = URL;
+    
+            // are we an image browser
+            if (typeof(win.ImageDialog) != "undefined") {
+                // we are, so update image dimensions...
+                if (win.ImageDialog.getImageData)
+                    win.ImageDialog.getImageData();
+    
+                // ... and preview if necessary
+                if (win.ImageDialog.showPreviewImage)
+                    win.ImageDialog.showPreviewImage(URL);
+            }
+    
+            // close popup window
+            tinyMCEPopup.close();
+        }
+    }
+
+    tinyMCEPopup.onInit.add(FileBrowserDialogue.init, FileBrowserDialogue);
+    
+</script>
+
+<script type="text/javascript" src="js/tabs.js"></script>
+
+<link rel="stylesheet" type="text/css" href="templates/cpl.css">
+<link rel="stylesheet" type="text/css" href="templates/tabs.css">
+<style type="text/css">
+    #dlg_head { background: url('images/bg_top.gif') top repeat-x; height: 56px; }
+    #dlg_head div { background: url('images/logo6.gif') no-repeat; padding: 20px 10px 0 270px; font-Family: Tahoma; font-size: 18px; font-weight: normal; color: #fff; }
+    #dlg_body { background-color: #fff; padding: 5px; }
+    #dlg_foot { background: url('images/greenline.gif') top repeat-x; padding: 20px 10px 10px 10px; text-align: center; }
+    #dlg_foot input { font-size: 18px; min-width: 5em; }
+    
+    .tab { height: 330px; overflow: auto; }
+    
+    #preview { position: absolute; top: 100px; left: 300px; border: dashed 1px gray; padding: 10px; background-color: #EFEFEF; display: none; }
+    #preview img { max-height: 100px; max-width: 150px; }
+        
+    #tab_lib a.del img { background: url('images/icons/16/delete.png') center center no-repeat; }
+    .processing img { background-image: url('images/icons/16/ajax-loader.gif') !important; }
+    #tab_lib td.file { background: url('images/icons/16/brick.png') 4px 4px no-repeat; padding-left: 24px; }
+    #tab_lib td.image { background-image: url('images/icons/16/image.png'); }
+    #tab_lib .file a { color: #000; text-decoration: none; border-bottom: dashed 1px black; }
+    #tab_lib .file a:hover { color: #000; text-decoration: none; border-bottom: solid 1px black; }
+    #tab_lib a.selected { font-weight: bold; border: dotted 1px black; }
+    #tab_lib input[type=file] { width: 22em; }
+    #tab_lib input[type=text] { width: 24em; }
+    
+    #files_loader { text-align: center; display: none; }
+    #nolibrary { text-align: center; line-height: 150%; margin: 40px 0; display: none; }
+</style>
+
+<script type="text/javascript">
+    var base = '{BASE}';
+    var hide_struct = '{HIDE_STRUCT}';
+        
+    $(document).ready(function(){
+        
+        var old_value = $("#selected_value").val(); 
+        if(parseInt(hide_struct)) {
+            $("ul.tabs #li_files a").click();    
+            $("ul.tabs #li_struct, #tab_struct").remove();
+        } else {            
+            if( old_value.split('.').pop().toLowerCase()=='html' || old_value.substr(-1)=='/' ) {}
+            else {
+                $("ul.tabs #li_files a").click();    
+            }
+        }
+                
+        $("#files_tree a").live("click", function(){ 
+            $("#preview").hide();
+            if(!$(this).hasClass('filename')) return ;
+            
+            var path = $(this).parent("li").attr('fullpath');
+            var filename = $(this).text();
+            var ext = filename.split('.').pop().toLowerCase();
+            
+            if($.inArray(ext, images) > -1) {                
+                $("#preview img").attr("src", base + path);
+                $("#preview").show();                                
+            } else {
+                $("#preview").hide();
+            }  
+            
+            $("#selected_value").val(path);
+        });
+        
+        $("#struct_tree a").live("click", function(){ 
+            var arr = new Array();
+            var key = $(this).attr("page_key");
+            var li = $(this).parent("li"); 
+            if(li.hasClass("folder")) key += '/';
+            else key += '.html';
+            arr.push(key);                
+            
+            while( (li = li.parents('li')) && li.length  )
+            {
+                arr.unshift( li.find('a').attr("page_key") )
+            }
+            
+            $("#selected_value").val(arr.join('/'));
+        });
+        
+        $("#tab_lib td.file a").live("click", function(){            
+            var filename = $(this).text();
+            var href = $(this).attr("href");
+            
+            $("#tab_lib td.file a").removeClass("selected");
+            $(this).addClass("selected");
+            
+            $("#selected_value").val(href);
+            
+            return false;
+        });
+        
+        $("ul.tabs li a").click(function(){
+            switch( $(this).parent("li").attr("id") ) {
+                case "li_struct":
+                    if( $("#tab_struct li.selected a").length ) $("#tab_struct li.selected a").click();
+                    break;
+                case "li_files":
+                    if( $("#tab_files li.selected a").length ) $("#tab_files li.selected a").click();
+                    break;
+                case "li_lib":
+                    if( $("#tab_lib td.file a.selected").length ) $("#tab_lib td.file a.selected").click();
+                    break;
+            }
+        });
+        
+        $("#files_table a.del").live("click", function(){
+            if(!$(this).hasClass("processing") && confirm('Удалить файл?\nВсе ссылки на него перестанут работать.')){
+                var a = $(this);
+                var tr = $(this).parents("tr");
+                var file_id = $(this).attr("href").split("#");
+                file_id = file_id[1];
+                $(this).addClass("processing");
+                $.post("ajax/file_del.php", {file_id: file_id}, function(data){
+                    if(data.trim() != '') {
+                        alert(data);
+                        a.removeClass("processing");
+                    }
+                    else {
+                        tr.remove();
+                    }
+                });
+            }            
+            return false;
+        });
+        
+        $("#upload_iframe").load(function(){
+            var data = $("#upload_iframe").contents().find('body').html();            
+            if(data != '') {   
+                alert(data);
+            }            
+           
+            var html = $("#file_inputs").html();
+            $("#file_inputs").html(html); 
+            show_files( material_id );
+        });
+        
+        $("#copy_form").submit(function(){
+                      
+            if(!$("#copy_form_url").val()) {
+                alert('Введите URL!');
+                return false;
+            }
+            
+            $("body").css("cursor", "wait");
+            var serialized = $(this).serializeArray();  
+            $.post($(this).attr("action"), serialized, function(data){
+                if(data != 'OK') { alert(data); }
+                else { 
+                    $("#copy_form_url").val('');
+                    show_files($("#copy_form_mat_id").val()); 
+                }
+                $("body").css("cursor", "");
+            });            
+            return false;
+        });
+        
+    });
+    
+    function show_files(material_id)
+    {   
+        $("#upload_form input").attr("disabled", "disabled");
+        $("#copy_form input").attr("disabled", "disabled");
+        $("#files_loader").show().css("height", $("#files_table").height() > 31 ? $("#files_table").height() : 31);
+        if(material_id) {
+            $("#files_table").html('').load("ajax/files_table.php", {material_id: material_id}, function(){ 
+                $("#files_loader").hide();
+                $("#upload_form input").removeAttr("disabled"); 
+                $("#copy_form input").removeAttr("disabled");
+                
+                if( $("#selected_value").val().match(/^files\/[0-9]+\/.+/) ) {
+                    var filename = $("#selected_value").val().split("/").pop();
+                    $("#files_table td.file a").each(function(){
+                        if($(this).attr("href").split("/").pop() == filename) $(this).click();
+                    });
+                }
+            });   
+        }
+    }
+    
+    
+</script>
+</head>
+
+<body>
+
+<div id="dlg_head">
+    <div>{TITLE}</div>
+</div>
+
+<div id="dlg_body">
+    <ul class="tabs">
+        <li id="li_struct"><a name="struct" href="#struct">Страницы</a></li>
+        <li id="li_files"><a name="files" href="#files">Файлы</a></li>
+        <li id="li_lib"><a name="lib" href="#lib">Библиотека</a></li>          
+    </ul>
+    <div class="tab" id="tab_struct">
+        {STRUCT}
+    </div>
+    <div class="tab" id="tab_files">
+        <div id="preview">
+            <div class="title"></div>
+            <img src="">
+        </div>
+        {FILES}
+    </div>
+    <div class="tab" id="tab_lib">
+        <div id="nolibrary">
+            <img src="images/icons/48/warning.png" width="48" height="48" border="0">
+            <br>
+            <strong>Библиотека файлов не доступна<br>пока материал не сохранен.</strong>
+        </div>
+        <div id="files_loader">
+            <img src="images/ajax-loader.gif" width="31" height="31" border="0">
+        </div>
+        <div id="files_table"></div>
+        
+        <form method="post" action="ajax/url2library.php" id="copy_form">
+        <input type="hidden" name="material_id" value="0" id="copy_form_mat_id">
+        <div style="margin: 10px 0;">
+            <strong>Загрузить файл в эту библиотеку с URL</strong>
+        </div>
+        <div style="margin: 10px 0;">
+            <input type="text" name="url" id="copy_form_url"><input type="submit" value="Загрузить">            
+        </div>
+        </form>
+        
+        <form method="post" action="ajax/file_upload.php" enctype="multipart/form-data" target="upload_iframe" id="upload_form">
+        <input type="hidden" name="material_id" value="0" id="upload_form_mat_id">
+        <div style="margin: 10px 0;">
+            <strong>Добавить файл в эту библиотеку</strong>
+        </div>
+        <div id="file_inputs">
+            <div><input type="file" name="userfile[]"><input type="submit" value="Загрузить файл"></div>
+        </div>            
+        <p>* размер загружаемого файла не должен превышать {INI_MAX_FILEZIE};</p>
+        <!-- p>** суммарный размер всех загружаемых файлов не должен превышать {INI_POST_MAXSIZE};</p -->
+        <p>Для загрузки файлов большего размера пользуйтесь FTP.</p>
+        </form>
+        
+        <iframe name="upload_iframe" id="upload_iframe" style="display: none;"></iframe>
+    </div>
+</div>
+
+<div id="dlg_foot">
+    <input type="hidden" id="selected_value" value="{OLD_VALUE}">
+    <input type="button" id="DLG_OK" value="OK" onClick="FileBrowserDialogue.mySubmit();">
+    <input type="button" id="DLG_CANCEL" value="Отмена" onclick="tinyMCEPopup.close();">
+</div>
+
+</body>
+</html>

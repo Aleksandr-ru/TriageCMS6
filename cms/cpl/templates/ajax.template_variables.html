@@ -1,0 +1,27 @@
+<table class="t1 mat">
+<tr>
+    <th>Переменная</th>
+    <th colspan="3">Глобальное значение</th>                
+</tr>
+<!-- BEGIN variable_row -->
+<tr>        
+    <td>{VARIABLE_NAME}</td>
+    
+    <td class="{VARIABLE_CLASS2}">{VAR_MATERIAL_NAME2}</td>
+    <td width="16">
+        <!-- BEGIN var_edit2 -->
+        <a href="material.php?id={VAR_EDIT2_ID}"><img src="images/icons/16/pencil.png" width="16" height="16" border="0" align="absmiddle"></a>
+        <!-- END var_edit2 -->
+    </td>
+    <td width="16">
+        <!-- BEGIN var_add -->
+        <a href="#{VAR_ADD_VAR}" onclick="browse_materials_var('{VAR_ADD_VAR}'); return false;"><img src="images/icons/16/add.png" width="16" height="16" border="0" align="absmiddle"></a>
+        <!-- END var_add -->
+        <!-- BEGIN var_del -->
+        <a href="ajax/template_variable_del.php?template_id={VAR_DEL_TMPL_ID}&variable={VAR_DEL_VAR}&material_id={VAR_DEL_ID}" class="remove_variable"><img src="images/icons/16/delete.png" width="16" height="16" border="0" align="absmiddle"></a>
+        <!-- END var_del -->
+    </td>
+    
+</tr>
+<!-- END variable_row -->
+</table>

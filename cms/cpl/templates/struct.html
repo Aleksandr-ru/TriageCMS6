@@ -1,0 +1,551 @@
+<!-- INCLUDE header.inc.html -->
+
+
+<div style="float: left; width: 60%;">
+
+<link rel="stylesheet" type="text/css" href="templates/tabs.css">
+<script type="text/javascript" src="js/tabs.js"></script>
+
+<script type="text/javascript">
+<!--
+	$(document).ready(function(){
+    	$("ul.tabs li a").click(function(){
+    		/*$("ul.tabs li").removeClass("selected");
+    		$(this).parents("li").addClass("selected");
+    		var index = $("ul.tabs li").index($(this).parents("li"));			
+    		$("div.tab").hide();
+    		$("div.tab").eq(index).show();*/
+            var index = $("ul.tabs li").index($(this).parents("li"));
+    		
+            switch(index)
+            {
+                /*case 2:
+                case 3:
+                    $("#bigbtn").val("Сохранить изменения");.attr("disabled", "disabled");
+                    break;
+                */
+                case 4:
+                    $("#delchk").removeAttr("checked");
+                    $("#bigbtn").val("Выполнить операции").removeAttr("disabled"); 
+                    $("#opwarn").stop().slideDown("fast");                    
+                    break;
+                default:
+                    $("#delchk").removeAttr("checked");
+                    $("#bigbtn").val("Сохранить изменения").removeAttr("disabled");
+                    $("#opwarn").stop().slideUp("fast");
+            }
+            
+    		//return false;
+    	});
+    
+    	//$("ul.tabs li:first a").click();
+        var a = window.location.href.split('#');
+		if(a[1] && $("a[name='"+a[1]+"']").html()) $("a[name='"+a[1]+"']").click();
+		else $("ul.tabs li:first a").click();
+        
+        $("#bigbtn").click(function(){
+            if($("div.tab:last").is(":visible"))
+            {
+                window.location.href = 'struct_operations.php?' + $("div.tab:last").find("input,select").serialize();
+                return false;
+            }
+        });
+        
+        $("div.tab:last select").val(0).val(-1);
+        
+        $("#delchk").change(function(){
+            var f = $(this).parents("form");
+            if($(this).is(":checked")) {                
+                f.find("input[type=submit]").val("Удалить страницу");
+            } else {                
+                f.find("input[type=submit]:last").val("Сохранить изменения");
+            }
+        });     
+	});
+//-->
+</script>
+
+<style type="text/css">
+    .tab ul { margin: 0; padding: 0; list-style-type: none; }
+    .tab li { margin: 10px; padding: 0; list-style-type: none; }
+    .tab li label { float: left; width: 14em; margin-right: 1em; }
+    .tab li input[type=text], .tab li select, .tab li textarea { width: 25em; }
+    .tab li textarea { height: 5em; }
+        
+    .t1 td { background-color: #eee; }
+    .mat .text { background: #eee url('images/icons/16/page_white_text.png') 4px 4px no-repeat; padding-left: 24px; }
+    .mat .html { background: #eee url('images/icons/16/page_white_world.png') 4px 4px no-repeat; padding-left: 24px; }
+    .mat .css { background: #eee url('images/icons/16/page_white_code.png') 4px 4px no-repeat; padding-left: 24px; }
+    .mat .javascript { background: #eee url('images/icons/16/page_white_code_red.png') 4px 4px no-repeat; padding-left: 24px; }
+    .mat .plugin { background: #eee url('images/icons/16/page_white_gear.png') 4px 4px no-repeat; padding-left: 24px; }
+    .mat .inactive { color: gray; }
+    
+    .btmcontrols { display: inline-block; text-align: left; margin-left: 15px; }
+    .btmcontrols ul, .btmcontrols ul li { list-style-type: none; margin: 0; padding: 0; }
+    .btmcontrols ul li { padding-bottom: 5px; }  
+    
+    #opwarn { display: none; }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){         
+        reload_materials();
+        reload_variables();
+        
+        $("#browse_parent").click(function(){
+            var title = 'Страница-родитель';
+            var dlg = window.open('dialog.php?script=struct&callback=dlg_parent&page_id='+$("#parent-id").val()+'&skip={PAGE_ID}&title='+title, 'parent', 'width=500, height=500'); 
+            dlg.focus();
+            return false;
+        });
+        
+        $("#browse_redirect").click(function(){
+            var title = 'Выбор страницы';
+            var dlg = window.open('dialog.php?script=struct&callback=dlg_redirect&page_id='+$("#redirect-id").val()+'&title='+title, 'parent', 'width=500, height=500'); 
+            dlg.focus();
+            return false;
+        });
+        
+        $("#root-page-0").click(function(){
+            if($(this).attr("checked"))
+            {
+                $("#is-home").attr({checked: 0, disabled: 1});
+            }
+        });
+        
+        $("#root-page-1").click(function(){                        
+            $("#parent-id").val(0);
+            $("#parent_name").val("");
+        });
+        
+        $("#redirect").change(function(){
+            $("#redirect-id").val(0);            
+        });
+        
+        $("#active").click(function(){
+            if($(this).attr("checked"))
+            {
+                $("#order").removeAttr("disabled");
+                $("#order").focus().select();
+            }
+            else
+            {
+                $("#order").attr("disabled", "disabled");
+            }
+        });
+        
+        $("#auto_key").click(function(){
+            if($(this).attr("checked"))
+            {
+                $("#key").attr("disabled", "disabled");
+            }
+            else
+            {
+                $("#key").removeAttr("disabled");
+            }
+        });
+        
+        $("a.browse1").live("click", function(){
+            var materials_block_name = $(this).attr("href").substr(1);            
+            browse_materials(materials_block_name); 
+            return false;
+        });
+        
+        $("a.browse2").live("click", function(){
+            var var_name = $(this).attr("href").substr(1);            
+            browse_materials_var(var_name); 
+            return false;
+        });
+        
+        $("a.remove_material").live("click", function(){
+            if(!confirm('Убрать этот материал со страницы?')) return false;            
+            $("body").css("cursor", "wait");
+            $.post( $(this).attr("href"), {}, function(data){
+                if(data != "OK") {
+                    alert(data);                    
+                } else {
+                    reload_materials();   
+                }
+                $("body").css("cursor", "auto");
+            });
+            return false;
+        });
+        
+        $("a.remove_variable").live("click", function(){
+            if(!confirm('Убрать локальное значение (для этой страницы)?')) return false;
+            var tr = $(this).parents("tr");
+            $("body").css("cursor", "wait");
+            $.post( $(this).attr("href"), {}, function(data){
+                if(data != "OK") {
+                    alert(data);
+                    $("body").css("cursor", "auto");                    
+                } else {
+                    reload_variables();
+                }                
+            });
+            return false;
+        });
+        
+        $("a.material_order").live("click", function(){
+            var tr = $(this).parents("tr");
+            var material_id = tr.attr("material_id");
+            var order = tr.find("td:first").text();
+                                                
+            if($(this).hasClass("down"))
+            {                
+                if(tr.next().attr("material_id")){
+                    $("body").css("cursor", "wait");
+                    var other_order = tr.next().find("td:first").text();
+                    $.post($(this).attr("href"), {current_id: material_id, current_order: order, other_id: tr.next().attr("material_id"), other_order: other_order}, function(data){ 
+                        if(data) alert(data);
+                        else
+                        {
+                            tr.next().find("td:first").text(order);
+                            tr.find("td:first").text(other_order);
+                            tr.insertAfter(tr.next());
+                        } 
+                        $("body").css("cursor", "auto");
+                    });                    
+                }
+            }
+            else if($(this).hasClass("up"))
+            {
+                if(tr.prev().attr("material_id")){
+                    $("body").css("cursor", "wait");
+                    var other_order = tr.prev().find("td:first").text();
+                    $.post($(this).attr("href"), {current_id: material_id, current_order: order, other_id: tr.prev().attr("material_id"), other_order: other_order}, function(data){ 
+                        if(data) alert(data);
+                        else
+                        {
+                            tr.prev().find("td:first").text(order);
+                            tr.find("td:first").text(other_order);
+                            tr.insertBefore(tr.prev());
+                        } 
+                        $("body").css("cursor", "auto");
+                    });         
+                }
+            }
+            
+            return false;
+        });
+    });
+    
+    function dlg_parent(btn, params)
+    {        
+        switch(btn)
+        {
+            case 'DLG_OK':
+            {
+                if(params.id && params.id > 0)
+                {
+                    $("#root-page-0").attr("checked", "checked");
+                    $("#root-page-0").click();
+                    $("#parent-id").val(params.id);
+                    $("#parent_name").val(params.name);
+                }                
+            }
+            case 'DLG_CANCEL':
+            default:
+            
+        }
+        return true;
+    }
+    
+    function dlg_redirect(btn, params)
+    {        
+        switch(btn)
+        {
+            case 'DLG_OK':
+            {
+                if(params.id && params.id > 0)
+                {
+                    $("#redirect-id").val(params.id);
+                    $("#redirect").val(params.name);
+                }                
+            }
+            case 'DLG_CANCEL':
+            default:
+            
+        }
+        return true;
+    }
+    
+    var current_materials_block;
+    
+    function browse_materials(block_name)
+    {
+        current_materials_block = block_name;
+        var title = 'Выбор материала';
+        var btntitle = 'Создать новый';
+        var dlg = window.open('dialog.php?script=materials&buttons[DLG_NEW]='+btntitle+'&callback=dlg_materials&title='+title, 'mat', 'width=500, height=500'); 
+        dlg.focus();
+        return false;
+    }
+    
+    function dlg_materials(btn, mat)
+    {
+        if(!current_materials_block) return false;
+        
+        switch(btn)
+        {
+            case 'DLG_NEW':
+                window.location.href = 'material.php?page_id={PAGE_ID}&block='+current_materials_block;
+                break;
+            case 'DLG_OK':
+            {
+                if(mat.id && mat.id > 0)
+                {                                
+                    //window.location.href = 'struct_material_set.php?page_id={PAGE_ID}&block='+current_materials_block+'&material_id='+mat.id;
+                    $("body").css("cursor", "wait");
+                    $.post("ajax/struct_material_set.php", {page_id: {PAGE_ID}, block: current_materials_block, material_id: mat.id}, function(data){
+                        
+                        if(data != "OK") {
+                            alert(data);    
+                            $("body").css("cursor", "auto");                                                        
+                        } else {
+                            reload_materials();    
+                        }                      
+                    });
+                }                
+            }
+            case 'DLG_CANCEL':
+            default:
+            
+        }
+        return true;
+    }
+    
+    var current_variable;
+    
+    function browse_materials_var(var_name)
+    {
+        current_variable = var_name;
+        var title = 'Выбор материала';
+        var btntitle = 'Создать новый';
+        var dlg = window.open('dialog.php?script=materials&buttons[DLG_NEW]='+btntitle+'&callback=dlg_materials_var&title='+title, 'mat', 'width=500, height=500'); 
+        dlg.focus();
+        return false;
+    }
+    
+    function dlg_materials_var(btn, mat)
+    {
+        if(!current_variable) return false;
+        
+        switch(btn)
+        {
+            case 'DLG_NEW':
+                window.location.href = 'material.php?page_id={PAGE_ID}&variable='+current_variable;
+                break;
+            case 'DLG_OK':
+            {
+                if(mat.id && mat.id > 0)
+                {                    
+                    //window.location.href = 'struct_variable_set.php?page_id={PAGE_ID}&variable='+current_variable+'&material_id='+mat.id;
+                    $("body").css("cursor", "wait");
+                    $.post("ajax/struct_variable_set.php", {page_id: {PAGE_ID}, variable: current_variable, material_id: mat.id}, function(data){
+                        
+                        if(data != "OK") {
+                            alert(data);    
+                            $("body").css("cursor", "auto");                                                        
+                        } else {
+                            reload_variables();    
+                        }                      
+                    });
+                }                
+            }
+            case 'DLG_CANCEL':
+            default:
+            
+        }
+        return true;
+    }
+    
+    function reload_materials()
+    {  
+        $("body").css("cursor", "wait");
+        $("#struct_materials").load("ajax/struct_materials.php?page_id={PAGE_ID}", {}, function(){ $("body").css("cursor", "auto"); });
+    }
+    
+    function reload_variables()
+    {      
+        $("body").css("cursor", "wait");
+        $("#struct_variables").load("ajax/struct_variables.php?page_id={PAGE_ID}", {}, function(){ $("body").css("cursor", "auto"); });
+    }
+</script>
+
+<div style="margin: 5px; padding: 5px;">
+
+<div class="warning" id="opwarn" style="margin-top: 0;">
+    <b>Внимание!</b><br>
+    Здесь Вы можете выполнить действия однвременно с несколькими страницами, в том числе и со всеми страницами на сайте. Будте внимательны при выборе области применения операций!
+</div>
+
+<form method="post" action="struct_save.php">
+<input type="hidden" name="page_id" value="{PAGE_ID}">
+<ul class="tabs">
+	<li><a name="params" href="#params">Страница</a></li>
+    <li><a name="more" href="#more">Дополнительно</a></li>
+	<li><a name="materials" href="#materials">Материалы</a></li>
+	<li><a name="variables" href="#variables">Переменные</a></li>	
+    <li><a name="operations" href="#operations">Операции</a></li>
+</ul>
+
+<div class="tab">
+    <ul>
+        <input type="hidden" name="parent_id" value="{PARENT_ID}" id="parent-id">
+        
+        <li><label>ID страницы:</label> <img src="images/icons/16/{PAGE_ICON}.png" width="16" height="16" border="0" align="absmiddle"> <strong>{PAGE_ID}</strong></li>
+        <li><label>Название:</label> <input type="text" name="page_name" value="{PAGE_NAME}"></li>
+        <li><label>Заголовок:</label> <input type="text" name="page_title" value="{PAGE_TITLE}"></li>
+        <li><label>Родительская страница:</label> <input type="radio" name="root_page" value="1" id="root-page-1" {ROOTPAGE1}> нет (эта страница расположена на верхнем уровне)</li>
+        <li><label>&nbsp;</label> <input type="radio" name="root_page" value="0" id="root-page-0" {ROOTPAGE0}> <input type="text" id="parent_name" value="{PARENT_NAME}" style="width: 22em;" readonly="readonly"> <a title="Выбрать страницу" href="#" id="browse_parent"><img src="images/icons/16/page_find.png" width="16" height="16" border="0" align="absmiddle"></a></li>
+        <li><label>Имя файла/папки (ключ):</label> <input type="text" name="key" id="key" value="{KEY}"></li>
+        <li><label>Авто-ключ:</label> <input type="checkbox" name="auto_key" id="auto_key" value="1" {AUTO_KEY_CHK} /> сгенерировать ключ из названия страницы</li>
+        <li><label>Главная страница:</label> <img src="images/icons/16/house.png" width="16" height="16" border="0" align="absmiddle"> <input type="checkbox" name="home" value="1" {HOME_CHK} {HOME_DIS}> с этой страницы начинается просмотр сайта</li>
+        <li><label>Порядок сортировки:</label> <input type="text" id="order" name="order" value="{ORDER}" {ORDER_DIS}></li>
+        <li><label>Страница включена:</label> <input type="checkbox" name="active" id="active" value="1" {ACTIVE_CHK}> эта страница присутствует в карте сайта и меню</li>
+    </ul>
+</div>
+
+<div class="tab">
+    <ul>
+        <input type="hidden" name="redirect_id" value="" id="redirect-id">
+        
+        <li><label>Шаблон:</label> <select name="template_id">{TEMPLATE_OPTIONS}</select></li>
+        <li><label>Группа доступа:</label> 
+            <select name="access_group">
+                {ACCESS_GROUP_OPTIONS}
+            </select>
+        </li>
+        <li><label>Редирект:</label> <input type="text" name="redirect" id="redirect" value="{REDIRECT}" style="width: 23em;"> <a title="Выбрать страницу" id="browse_redirect" href="#"><img src="images/icons/16/page_find.png" width="16" height="16" border="0" align="absmiddle"></a></li>
+        <!-- li><label>Открывать в:</label> <select name="target"></select></li -->
+        <li><label>Ключевые слова:</label> <textarea wrap="virtual" name="keywords">{KEYWORDS}</textarea></li>
+        <li><label>Описание:</label> <textarea wrap="virtual" name="description">{DESCRIPTION}</textarea></li>       
+        <li><label>Удалить страницу:</label> <input type="checkbox" name="delete" value="1" id="delchk" /> убрать из структуры и отправить в корзину (все ссылки на страницу перестанут работать)</li> 
+    </ul>
+</div>
+
+<div class="tab">
+    <div id="struct_materials"></div>
+    <br>
+    * изменения сделанные здесь применяются немедленно
+    <br>
+    ** если Вы внесли изменения на других вкладках, нажмите "Сохранить изменения"
+</div>
+
+<div class="tab">
+    <div id="struct_variables"></div>
+    <br>
+    * изменения сделанные здесь применяются немедленно
+    <br>
+    ** если Вы внесли изменения на других вкладках, нажмите "Сохранить изменения"
+</div>
+
+<div class="tab">
+        
+    <input type="hidden" name="operation_src_page_id" value="{PAGE_ID}">
+    <ul>
+        <li><label>Выполнить операции для:</label>
+            <select name="operation_scope">
+                <option value="parent:{PAGE_ID};recursive:1">Всех дочерних страниц</option>
+                <option value="parent:{PARENT_ID};recursive:0">Всех страниц на текущем уровне иерархии</option>
+                <option value="parent:{PARENT_ID};recursive:1">Всех страниц на текущем уровне + дочерних</option>
+                <option value="parent:0;recursive:1">Всех страниц на сайте</option>
+            </select>
+        </li>
+        <li><label>Установить авто-ключ:</label> <input type="checkbox" name="operation_auto_key"> сгенерировать ключи из названий страниц где возможно</li>
+        <li><label>Включить страницы:</label> <input type="checkbox" name="operation_activate"> активировать отключенные страницы</li>
+        <li><label>Упорядочить страницы:</label> <input type="checkbox" name="operation_enum"> перенумеровать включенные страницы</li>
+        <li><label>Установить шаблон:</label>
+            <select name="operation_template">
+                <option value="0">(не менять шаблон)</option>
+                {TEMPLATE_OPTIONS}
+            </select>
+        </li>
+        <li><label>Установить группу доступа:</label> 
+            <select name="operation_access">
+                <option value="-1">(не менять группу доступа)</option>
+                {ACCESS_GROUP_OPTIONS}
+            </select>
+        </li>
+        <li><label>Очистить материалы:</label> <input type="checkbox" name="operation_clean_materials"> убрать все материалы из всех блоков</li>
+        <li><label>Очистить переменные:</label> <input type="checkbox" name="operation_clean_variables"> убрать все локальные значения перемнных</li>
+    </ul>     
+</div>
+
+<div style="padding: 10px; margin: 10px; text-align: center;">
+    <div style="position: relative; left: 50%; margin-left: -300px; width: 650px;">
+        <div style="float: left;">
+            <input type="submit" value="Сохранить изменения" class="bigbutton" id="bigbtn" {NO_ID_DIS}>    
+        </div>
+        <div class="btmcontrols" style="float: left;">
+            <ul class="textlinks boldlinks">                
+                <li>
+                    <button type="button" onclick="window.open('viseditor.php?page_id={PAGE_ID}');"><img src="images/icons/16/application_edit.png" width="16" height="16" border="0" align="absmiddle"> Открыть визуальный редактор страницы</button>
+                </li>
+                <li>
+                    <img src="images/icons/16/page_go.png" width="16" height="16" border="0" align="absmiddle"> <a target="_blank" href="../../index.php?page_id={PAGE_ID}">Открыть страницу по ID</a> [ <a target="_blank" href="{PAGE_FULLPATH}">полный путь</a> ]
+                </li>
+            </ul>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+</form>
+
+</div>
+
+<!-- BEGIN error -->
+<div class="error">
+    <strong>{ERROR_TITLE}</strong><br>
+    {ERROR_TEXT}
+</div>
+<!-- END error -->
+
+<!-- BEGIN warning -->
+<div class="warning">
+    <strong>{WARNING_TITLE}</strong><br>
+    {WARNING_TEXT}
+</div>
+<!-- END warning -->
+<!-- BEGIN notice -->
+<div class="notice">
+    <strong>{NOTICE_TITLE}</strong><br>
+    {NOTICE_TEXT}
+</div>
+<!-- END notice -->
+
+</div>
+<div style="float: left; width: 40%;">
+
+<style type="text/css">
+	#struct_tree { margin: 5px; padding: 5px; background-color: #eee; border: solid 1px #ccc; }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#struct_tree a").live("click", function(){ 
+            window.location.href = 'struct.php?page_id=' + $(this).attr("page_id");
+            return true; // чтоб передать обработку внутреннему обработчику диалога, который добавит selected и вернет false 
+        });
+    });
+</script>
+
+{STRUCT_TREE}
+
+<div style="margin: 10px;" id="addpage" class="textlinks">
+    <img src="images/icons/16/page_add.png" width="16" height="16" border="0" align="absmiddle">
+    <a href="struct_add.php?template_id={TEMPLATE_ID}&parent_id=0" title="Создать страницу на верхнем уровне иерархии">Добавить новую страницу</a>
+    [ 
+    <a href="struct_add.php?template_id={TEMPLATE_ID}&parent_id={PARENT_ID}" title="Создать страницу на текущем уровне иерархии">на этот уровень</a> |
+    <a href="struct_add.php?template_id={TEMPLATE_ID}&parent_id={PAGE_ID}" title="Создать дочернюю страницу относительно текущей">дочернюю</a> 
+    ]
+</div>
+
+
+</div>
+<div class="clear"></div>
+
+
+<!-- INCLUDE footer.inc.html --> 

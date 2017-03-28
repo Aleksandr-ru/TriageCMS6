@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<title>Triage CMS - {TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; Charset=utf-8" />
+<meta http-equiv="Content-Language" content="ru" />
+<meta name="Author" content="Rebel" />
+
+<script type="text/javascript" src="../scripts/jquery.js"></script>
+<script type="text/javascript" src="../scripts/jquery.scrollTo.js"></script>
+
+<script type="text/javascript">
+<!--
+	$(document).ready(function(){
+        
+        $("#topmenu .dropdown").click(function(){ 			
+			
+            var sm = $(this).parents("li").find(".submenu");			
+			if(sm.is(":visible")) { 
+                sm.slideUp("slow"); 
+            } else {
+				$(".submenu:visible").slideUp("slow");
+				sm.slideDown("slow");
+                sm.css("z-index", 1001); // to overlap dynamic editor
+			}
+            return false;
+		});
+        
+        $("#cplheader_allplugins a").click(function(){
+            var num = $("#cplheader_numplugins").text();            
+            if(num == 0) {
+                alert('В системе нет установленных плагинов.');
+                return false;    
+            }            
+        });
+
+	});
+
+	$(document).click(function(e){ if(!$(e.target).hasClass("dropdown")) $(".submenu").slideUp("slow"); });
+//-->
+</script>
+
+<link rel="stylesheet" type="text/css" href="templates/cpl.css" />
+
+</head>
+
+<body>
+
+<div id="topmenu">
+
+<ul>
+	<li>
+		<a href="index.php"><img src="images/logo6.gif" width="232" height="55" border="0" alt="Triage CMS"></a>
+	</li>
+	<li style="width: 3%;">
+		&nbsp;
+	</li>
+	<li>
+		<div class="item"><a href="struct.php">
+		<div class="icon"><img src="images/icons/48/index.png" width="48" height="48" border="0" alt="Структура"></div>
+		<div class="text">
+			<div class="small">страниц: {CPLHEADER_NUM_PAGES}</div>
+			<div class="caption">Структура</div>
+		</div>
+		<div class="clear"></div>
+		</a></div>
+	</li>
+	<li>
+		<div class="item"><a href="materials.php">
+		<div class="icon"><img src="images/icons/48/books.png" width="48" height="48" border="0" alt="Материалы"></div>
+		<div class="text">
+			<div class="small">активных: {CPLHEADER_NUM_MATERIALS}</div>
+			<div class="caption">Материалы</div>
+		</div>
+		<div class="clear"></div>
+		</a></div>
+	</li>
+	<li>
+		<div class="item dropdown"><a href="#">
+		<div class="icon"><img src="images/icons/48/package.png" width="48" height="48" border="0" alt="Плагины"></div>
+		<div class="text">
+			<div class="small">установлено: <span id="cplheader_numplugins">{CPLHEADER_NUM_PLUGINS}</span></div>
+			<div class="caption">Плагины</div>
+		</div>
+		<div class="clear"></div>
+		</a></div>
+
+		<div class="submenu">
+			<ul>              
+                <li id="cplheader_allplugins">
+					<div class="item"><a href="plugins.php">
+					<div class="icon"><img src="images/icons/48/components.png" width="48" height="48" border="0" alt="Все плагины"></div>
+					<div class="text">
+						<div class="small">список плагинов</div>
+						<div class="caption">Все плагины</div>						
+					</div>
+					<div class="clear"></div>
+					</a></div>
+				</li>
+                <!-- BEGIN cplheader_plugin -->
+                <li>
+					<div class="item"><a href="plugin.php?plugin_uid={CPLHEADER_PLUGIN_UID}">
+					<div class="icon"><img src="images/icons/48/component.png" width="48" height="48" border="0" alt="Плагин"></div>
+					<div class="text">
+						<div class="small">{CPLHEADER_PLUGIN_DESC}</div>
+						<div class="caption">{CPLHEADER_PLUGIN_NAME}</div>						
+					</div>
+					<div class="clear"></div>
+					</a></div>
+				</li>
+                <!-- END cplheader_plugin -->				
+				<li>
+					<div class="item"><a href="plugin_install.php">
+					<div class="icon"><img src="images/icons/48/box_add.png" width="48" height="48" border="0" alt="Установить плагин"></div>
+					<div class="text">
+						<div class="small">доступно: {CPLHEADER_NUM_PLUGINS2}</div>
+						<div class="caption">Установить плагин</div>						
+					</div>
+					<div class="clear"></div>
+					</a></div>
+				</li>
+			</ul>
+		</div>
+	</li>	
+	<li>
+		<div class="item"><a href="users.php">
+		<div class="icon"><img src="images/icons/48/users4.png" width="48" height="48" border="0" alt="Пользователи"></div>
+		<div class="text">
+			<div class="small">активных: {CPLHEADER_NUM_USERS}</div>
+			<div class="caption">Пользователи</div>
+		</div>
+		<div class="clear"></div>
+		</a></div>
+	</li>
+	<li>
+		<div class="item dropdown"><a href="#">
+		<div class="icon"><img src="images/icons/48/toolbox.png" width="48" height="48" border="0" alt="Настройки и инструменты"></div>
+		<div class="text">
+			<div class="small">настройки и</div>
+			<div class="caption">Инструменты</div>
+		</div>
+		<div class="clear"></div>
+		</a></div>
+
+		<div class="submenu">
+			<ul>
+				<li>
+					<div class="item"><a href="settings.php">
+					<div class="icon"><img src="images/icons/48/nut_and_bolt.png" width="48" height="48" border="0" alt="Настройки"></div>
+					<div class="text">
+						<div class="small">основные параметры</div>
+						<div class="caption">Настройки</div>						
+					</div>
+					<div class="clear"></div>
+					</a></div>
+				</li>
+                <li>
+					<div class="item"><a href="groups.php">
+					<div class="icon"><img src="images/icons/48/hammer.png" width="48" height="48" border="0" alt="Настройки"></div>
+					<div class="text">
+						<div class="small">всего групп: {CPLHEADER_NUM_GROUPS}</div>
+						<div class="caption">Группы доступа</div>						
+					</div>
+					<div class="clear"></div>
+					</a></div>
+				</li>
+				<li>
+					<div class="item"><a href="templates.php">
+					<div class="icon"><img src="images/icons/48/text_rich_marked.png" width="48" height="48" border="0" alt="Шаблоны"></div>
+					<div class="text">
+						<div class="small">доступно: {CPLHEADER_NUM_TEMPLATES}</div>
+						<div class="caption">Шаблоны</div>						
+					</div>
+					<div class="clear"></div>
+					</a></div>
+				</li>
+                <li>
+					<div class="item"><a href="filemanager.php">
+					<div class="icon"><img src="images/icons/48/folder_document.png" width="48" height="48" border="0" alt="Файлы"></div>
+					<div class="text">
+						<div class="small">управление файлами</div>
+						<div class="caption">Файлы</div>						
+					</div>
+					<div class="clear"></div>
+					</a></div>
+				</li>				
+				<li>
+					<div class="item"><a href="syslog.php">
+					<div class="icon"><img src="images/icons/48/history2.png" width="48" height="48" border="0" alt="Журнал"></div>
+					<div class="text">
+						<div class="small">записей: {CPLHEADER_NUM_LOG}</div>
+						<div class="caption">Журнал системы</div>						
+					</div>
+					<div class="clear"></div>
+					</a></div>
+				</li>
+                <li>
+					<div class="item"><a href="trashcan.php">
+					<div class="icon"><img src="images/icons/48/garbage.png" width="48" height="48" border="0" alt="Корзина"></div>
+					<div class="text">
+						<div class="small">объектов: {CPLHEADER_NUM_TRASH}</div>
+						<div class="caption">Корзина</div>						
+					</div>
+					<div class="clear"></div>
+					</a></div>
+				</li>
+				<li>
+					<div class="item"><a href="{CPLHEADER_DEBUG_URL}">
+					<div class="icon"><img src="images/icons/48/bug_yellow.png" width="48" height="48" border="0" alt="Отладчик"></div>
+					<div class="text">
+						<div class="small">режим отладки: {CPLHEADER_DEBUG}</div>
+						<div class="caption">Отладчик</div>						
+					</div>
+					<div class="clear"></div>
+					</a></div>
+				</li>
+			</ul>
+		</div>
+	</li>
+    <li>
+        <div class="item"><a href="help.php" title="Помощь">
+		<div class="icon"><img src="images/icons/48/help.png" width="48" height="48" border="0" alt="Помощь"></div>
+		<!-- div class="text">
+			<div class="small">справка и поддержка</div>
+			<div class="caption">Помощь</div>
+		</div -->
+		<div class="clear"></div>
+		</a></div>
+    </li>
+</ul>
+<div class="clear"></div>
+</div>
+
+<div id="content">

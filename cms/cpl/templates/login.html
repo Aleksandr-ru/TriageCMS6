@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<title>Triage CMS - Вход</title>
+<meta http-equiv="Content-Type" content="text/html; Charset=utf-8">
+<meta http-equiv="Content-Language" content="ru">
+<meta name="Author" content="Rebel">
+
+<style type="text/css">
+	div { border: solid 0 red; }
+	.clear { clear: both; }
+
+	body { padding: 0; margin: 0; background-color: #6a6a6a; }
+    body, p, td { font-Family: Tahoma; font-size: 12px; }
+    
+    #login { width: 500px; margin-left: auto; margin-right: auto; margin-top: 15%; border: solid 1px #cdcdcd; background: #fff url('images/bg_top.gif') top repeat-x; }
+    #login form { margin: 5px; }
+    #login form label { font-weight: bold; }
+    #login form input.text { width: 200px; }
+    #login table { margin: 5px; margin-left: 70px; }
+    #login table td { padding: 5px; }
+    
+    #top { background: url('images/logo6.gif') no-repeat; height: 56px; padding-left: 270px; padding-top: 20px; font-Family: Tahoma; font-size: 18px; font-weight: normal; color: #fff; }
+    #cmm { height: 96px; }
+    #cmm img { float: left; margin: 5px; }
+    .error { color: red; }
+</style>
+
+</head>
+
+<body onload="document.getElementById('user_login').focus();">
+
+<div id="login">
+<div id="top">Вход в панель управления</div>
+
+<form method="post" action="" >
+
+<table>
+<tr>
+	<td><label>Логин:</label></td>
+	<td><input type="text" class="text" id="user_login" name="user_login" value="{LOGIN}"></td>
+</tr>
+<tr>
+	<td><label>Пароль:</label></td>
+	<td><input type="password" class="text" name="user_password"></td>
+</tr>
+<tr>
+    <td>&nbsp;</td>
+	<td align="right"><input type="submit" name="cms_login" value="Вход"></td>
+</tr>
+</table>
+
+<div id="cmm">
+    <img src="images/lock.png" width="128" height="128">
+    <p class="error">{ERROR}</p>
+    <p>Используйте правильный логин и пароль, чтобы получить доступ к панели управления этим сайтом.</p>
+    <p><a href="../../">Вернуться на главную страницу</a></p>
+</div>
+
+</form>
+
+</div>
+
+</body>
+</html>

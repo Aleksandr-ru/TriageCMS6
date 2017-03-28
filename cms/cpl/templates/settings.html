@@ -1,0 +1,61 @@
+<!-- INCLUDE header.inc.html -->
+
+<style type="text/css">
+    .t3 { width: 1000px; }
+    .t3 input[type=text] { width: 450px; }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#settings_table tr").mouseover(function(){ $(this).css("background-color", "#F0FAE8"); });
+        $("#settings_table tr").mouseout(function(){ $(this).css("background-color", ""); });
+    });
+</script>
+
+<div id="settings_table">
+
+<!-- BEGIN error -->
+<div class="error">
+    <strong>{ERROR_TITLE}</strong><br>
+    {ERROR_TEXT}
+</div>
+<!-- END error -->
+
+<!-- BEGIN warning -->
+<div class="warning">
+    <strong>{WARNING_TITLE}</strong><br>
+    {WARNING_TEXT}
+</div>
+<!-- END warning -->
+<!-- BEGIN notice -->
+<div class="notice">
+    <strong>{NOTICE_TITLE}</strong><br>
+    {NOTICE_TEXT}
+</div>
+<!-- END notice -->
+
+<form method="post" action="settings_save.php">
+<table class="t3">
+<thead>
+    <tr>
+    	<th width="50%">Параметр</th>
+    	<th width="50%">Значение</th>
+    </tr>
+</thead>
+<!-- BEGIN set -->
+<tr>
+	<td>{SETTING_NAME}</td>
+	<td>{SETTING_VALUE}</td>
+</tr>
+<!-- END set -->
+</table>
+
+<div style="padding: 10px; margin: 10px; text-align: center;">
+    <input type="submit" value="Сохранить настройки" class="bigbutton">
+</div>
+
+</form>
+
+</div>
+
+<!-- INCLUDE footer.inc.html -->

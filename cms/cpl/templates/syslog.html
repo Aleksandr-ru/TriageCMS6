@@ -1,0 +1,163 @@
+<!-- INCLUDE header.inc.html -->
+
+<style type="text/css">
+    
+    #syslog_table input[type=text] { width: 30px; font-size: 10px; }
+    /*#syslog_table th.filter { background: #DADADA url('images/icons/16/filter.png') right center no-repeat; padding-right: 20px; cursor: pointer; }*/
+    #syslog_table th.filter {
+        cursor: pointer;
+    }
+    #syslog_table th.filter img {
+        vertical-align: middle;
+    }
+    #syslog_table th.on {         
+        background: #e66666; /* Old browsers */
+        background: -moz-linear-gradient(top,  #e66666 0%, #b23939 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e66666), color-stop(100%,#b23939)); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  #e66666 0%,#b23939 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  #e66666 0%,#b23939 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  #e66666 0%,#b23939 100%); /* IE10+ */
+        background: linear-gradient(to bottom,  #e66666 0%,#b23939 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e66666', endColorstr='#b23939',GradientType=0 ); /* IE6-9 */
+                
+        text-shadow: #491818 1px 1px 5px;
+    }
+    #syslog_table div.filter { background-color: #DADADA; border: solid 1px; position: absolute; padding: 5px; display: none; margin-top: 10px; }
+    #syslog_table div.filter div { margin: 2px 0; }
+    #syslog_table div.filter form { padding: 0; margin: 0; }
+    #syslog_table #filter1_users { overflow: auto; max-height: 400px; }    
+    
+    #filter2_objs span { display: inline-block; width: 5em; }   
+    
+    .filter label {
+        display: block;
+    }     
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        var fc = false;
+        $("#syslog_table tbody tr").mouseover(function(){ $(this).css("background-color", "#F0FAE8"); });
+        $("#syslog_table tbody tr").mouseout(function(){ $(this).css("background-color", ""); });
+        
+        $("#syslog_table th.filter").click(function(){
+            //$("div.filter").hide();
+            var index = $("#syslog_table th.filter").index($(this));
+            var div = $("#filter"+index);
+            div.slideToggle("fast");
+            if(div.is(":visible")) {
+                div.css("top", $(this).position().top + $(this).height() + 8).css("left", $(this).position().left);
+            }
+            return false;
+        });
+        
+        $("#filter1_all input[type=checkbox]").click(function(){
+            $("#filter1_users input[type=checkbox]").removeAttr("checked");
+            $(this).attr("checked", "checked");
+        });
+        
+        $("#filter1_users input[type=checkbox]").click(function(){
+            $("#filter1_all input[type=checkbox]").removeAttr("checked");
+        });
+        
+        $("#filter2_all input[type=checkbox]").click(function(){
+            $("#filter2_objs input[type=checkbox]").removeAttr("checked");
+            $(this).attr("checked", "checked");
+        });
+        
+        $("#filter2_objs input[type=checkbox]").click(function(){
+            $("#filter2_all input[type=checkbox]").removeAttr("checked");
+        });
+        
+        /*$("#filter2_objs span, #filter2_all strong").click(function(){            
+            $(this).prev("input[type=checkbox]").click();
+        });*/
+        
+        $("#filter2_objs input[type=text]").change(function(){
+            var chk = $(this).prev().prev("input"); 
+            if(!chk.is(":checked")) chk.click();
+        });
+        
+        $("#syslog_table div.filter").click(function(){
+            fc=true;
+        });
+        
+        $("#syslog_table").click(function(){
+            if(!fc) {
+                $("div.filter").hide();    
+            }
+            fc = false;
+        });
+    });
+</script>
+
+<div id="syslog_table">
+
+<div class="filter" id="filter0">
+    <form method="post" action="">
+        <div>от <select name="filter_date1">{DATE_OPTIONS1}</select></div>
+        <div>до <select name="filter_date2">{DATE_OPTIONS2}</select></div>
+        <div><button type="submit">применить <img src="images/icons/16/filter.png" border="0" width="16" height="16" align="absmiddle"></button></div>
+    </form>
+</div>
+<div class="filter" id="filter1">
+    <form method="post" action="">
+        <label id="filter1_all"><input type="checkbox" name="filter_allusers" {F_ALL_USERS_CHK}> <strong>все пользователи</strong></label>
+        <div id="filter1_users">
+            <!-- BEGIN filter_user -->
+            <label><input type="checkbox" name="filter_user[]" value="{F_USER_ID}" {F_USER_CHK}> {F_USER_NAME}</label>
+            <!-- END filter_user -->
+        </div>
+        <div><button type="submit">применить <img src="images/icons/16/filter.png" border="0" width="16" height="16" align="absmiddle"></button></div>
+    </form>
+</div>
+<div class="filter" id="filter2">
+    <form method="post" action="">
+        <label id="filter2_all"><input type="checkbox" name="filter_allobj" {F_ALL_OBJ_CHK}> <strong>все объекты</strong></label>
+        <div id="filter2_objs">
+            <!-- BEGIN filter_obj -->
+            <label><input type="checkbox" name="filter_obj[]" value="{F_OBJ}" {F_OBJ_CHK}> <span>{F_OBJ}</span> <input type="text" name="filter_objval[{F_OBJ}]" value="{F_OBJ_VAL}"></label>
+            <!-- END filter_obj -->
+        </div>
+        <div><button type="submit">применить <img src="images/icons/16/filter.png" border="0" width="16" height="16" align="absmiddle"></button></div>
+    </form>
+</div>
+
+<table class="t3">
+<thead>
+    <tr>
+    	<th class="filter on">
+            Дата время
+            <img src="images/icons/16/filter.png" />
+        </th>
+    	<th class="filter {FILTER1_ON}">
+            Пользователь
+            <img src="images/icons/16/filter.png" />
+        </th>
+        <th>Событие</th>
+        <th class="filter {FILTER2_ON}">
+            Объект
+            <img src="images/icons/16/filter.png" />
+        </th>
+    </tr>
+</thead>
+<tbody>
+    <!-- BEGIN row -->
+    <tr>
+    	<td>{DATE}</td>
+    	<td>{USER}</td>
+        <td>{EVENT}</td>
+        <td>{OBJECT}</td>
+    </tr>
+    <!-- END row -->
+</tbody>
+<tfoot>
+    <tr>
+        <td colspan="4"><strong>Отображено записей: {SHOW_CNT} из {ALL_CNT}.</strong></td>
+    </tr>
+</tfoot>
+</table>
+
+</div>
+
+<!-- INCLUDE footer.inc.html -->

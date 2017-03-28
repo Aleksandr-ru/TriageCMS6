@@ -1,0 +1,67 @@
+<!-- INCLUDE header.inc.html -->
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#plugin_install tr").mouseover(function(){ $(this).css("background-color", "#F0FAE8"); $(this).find("input").show(); });
+        $("#plugin_install tr").mouseout(function(){ $(this).css("background-color", ""); $(this).find("input").hide(); });
+    });
+</script>
+
+<style type="text/css">
+    #plugin_install { padding: 30px; }
+    #plugin_install table { background-color: #cdcdcd; border-spacing: 1px; }
+    #plugin_install table tr { background-color: #fff; }
+    #plugin_install table tr th { background-color: #cdcdcd; padding: 10px; }
+    #plugin_install table tr td { padding: 10px; }
+    td.install_button { padding: 0; width: 250px; text-align: center; }
+    td.install_button input { margin: 0; display: none; }
+</style>
+
+<!-- BEGIN error -->
+<div class="error">
+    <strong>{ERROR_TITLE}</strong><br>
+    {ERROR_TEXT}
+</div>
+<!-- END error -->
+
+<!-- BEGIN warning -->
+<div class="warning">
+    <strong>{WARNING_TITLE}</strong><br>
+    {WARNING_TEXT}
+</div>
+<!-- END warning -->
+<!-- BEGIN notice -->
+<div class="notice">
+    <strong>{NOTICE_TITLE}</strong><br>
+    {NOTICE_TEXT}
+</div>
+<!-- END notice -->
+
+<div id="plugin_install">
+    <table class="t3">
+    <thead>
+        <tr>
+            <th colspan="2">Список плагинов, доступных для установки</th>
+        </tr>
+    </thead>
+    <!-- BEGIN plugin -->
+    <tr>
+        <td>
+            <p><strong>{PLUGIN_NAME}</strong> ({PLUGIN_UID})</p>
+            <p>{PLUGIN_DESC}</p>
+        </td>
+        <td class="install_button">
+            <input type="button" class="bigbutton" value="Установить плагин" onclick="window.location.href='plugin_install.php?install={PLUGIN_UID}';">
+        </td>
+    </tr>
+    <!-- END plugin -->
+    <tr>
+        <td colspan="2">
+            <div class="textlinks"><img src="images/icons/16/package.png" width="16" height="16" align="absmiddle"> <a href="plugins.php">перейти к управлению плагинами</a> </div>    
+        </td>
+    </tr>
+    </table>    
+    
+</div>
+
+<!-- INCLUDE footer.inc.html -->

@@ -1,0 +1,97 @@
+<!-- INCLUDE header.inc.html -->
+
+<style type="text/css">
+
+</style>
+
+<script type="text/javascript" src="../scripts/jquery.insertAtCaret.js"></script>
+<script type="text/javascript" src="../scripts/jquery.tabby.js"></script>
+<script type="text/javascript" src="../editor/codemirror/js/codemirror.js"></script>
+<script type="text/javascript" src="../editor/tinymce/jscripts/tiny_mce/jquery.tinymce.js"></script>
+
+<script type="text/javascript">
+    var tinymce_base_url = '{TINYMCE_BASE_URL}';
+</script>
+<script type="text/javascript" src="js/tinymce_config.js"></script>
+
+<script type="text/javascript">
+<!--
+    var use_tinymce = {USE_TINYMCE};
+    var use_codemirror = {USE_CODEMIRROR};
+    
+    $(document).ready(function(){
+        
+        /* visual editors init */
+        
+        if(use_tinymce) {
+            $("textarea.visualEditor").tinymce(tinymce_config_advanced);            
+            $("textarea.visualSimple").tinymce(tinymce_config_simple);
+            $("textarea.visualExtbr").tinymce(tinymce_config_exttoolbar);
+        }
+        else if(use_codemirror) {
+            
+            $("textarea.visualEditor, textarea.visualSimple, textarea.visualExtbr").wrap('<div class="codeBorder"></div>').each(function(){
+                CodeMirror.fromTextArea( $(this).get(0) , {                
+                    parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
+                    stylesheet: ["../editor/codemirror/css/xmlcolors.css", "../editor/codemirror/css/jscolors.css", "../editor/codemirror/css/csscolors.css"],
+                    path: "../editor/codemirror/js/"   
+                });    
+            });    
+        }
+        else {
+            $("textarea.visualEditor, textarea.visualSimple, textarea.visualExtbr").tabby();
+        }
+        
+        /* code editors init */
+        
+        if(use_codemirror) {
+            
+            $("textarea.codeEditor").wrap('<div class="codeBorder"></div>').each(function(){
+                CodeMirror.fromTextArea( $(this).get(0) , {                
+                    parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
+                    stylesheet: ["../editor/codemirror/css/xmlcolors.css", "../editor/codemirror/css/jscolors.css", "../editor/codemirror/css/csscolors.css"],
+                    path: "../editor/codemirror/js/"   
+                });    
+            });  
+        }
+        else {
+            $("textarea.codeEditor").tabby();
+        }
+        
+        /* tabby editors init */
+        
+        $("textarea.tabbyEditor").tabby();
+    });
+//-->    
+</script>
+
+<div>
+    
+    <!-- BEGIN error -->
+    <div class="error">
+        <strong>{ERROR_TITLE}</strong><br>
+        {ERROR_TEXT}
+    </div>
+    <!-- END error -->
+    
+    <!-- BEGIN warning -->
+    <div class="warning">
+        <strong>{WARNING_TITLE}</strong><br>
+        {WARNING_TEXT}
+    </div>
+    <!-- END warning -->
+    
+    <!-- BEGIN notice -->
+    <div class="notice">
+        <strong>{NOTICE_TITLE}</strong><br>
+        {NOTICE_TEXT}
+    </div>
+    <!-- END notice -->
+
+</div>
+
+<div id="plugin_output">
+{PLUGIN_OUTPUT}
+</div>
+
+<!-- INCLUDE footer.inc.html -->

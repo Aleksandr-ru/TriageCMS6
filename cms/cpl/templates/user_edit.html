@@ -1,0 +1,71 @@
+<!-- INCLUDE header.inc.html -->
+
+<link rel="stylesheet" type="text/css" href="templates/tabs.css">
+<script type="text/javascript" src="js/tabs.js"></script>
+
+<style type="text/css">
+    .tab ul { margin: 0; padding: 0; list-style-type: none; }
+    .tab li { margin: 10px; padding: 0; list-style-type: none; }
+    .tab li label { float: left; width: 18em; margin-right: 1em; }
+    .tab li input[type=text], .tab li select, .tab li textarea { width: 22em; }
+    .tab li textarea { height: 4em; }
+</style>
+
+<div style="margin: 5px auto; padding: 5px; width: 600px;">
+
+<!-- BEGIN error -->
+<div class="error">
+    <strong>{ERROR_TITLE}</strong><br>
+    {ERROR_TEXT}
+</div>
+<!-- END error -->
+
+<!-- BEGIN warning -->
+<div class="warning">
+    <strong>{WARNING_TITLE}</strong><br>
+    {WARNING_TEXT}
+</div>
+<!-- END warning -->
+<!-- BEGIN notice -->
+<div class="notice">
+    <strong>{NOTICE_TITLE}</strong><br>
+    {NOTICE_TEXT}
+</div>
+<!-- END notice -->
+<form method="post" action="user_save.php">
+<input type="hidden" name="user_id" value="{USER_ID}">
+
+<ul class="tabs">
+    <li class="selected"><a href="#params">Параметры пользователя</a></li>
+    <li ><a href="#groups">Группы доступа</a></li>
+</ul>
+
+<div class="tab" id="tab1">
+    <ul>
+        <li><label>ID пользователя:</label> <img src="images/icons/16/user.png" border="0" width="16" height="16" align="absmiddle"> <strong>{USER_ID_TEXT}</strong></li>
+        <li><label>Логин:</label> <input type="text" name="login" value="{USER_LOGIN}"></li>
+        <li><label>Новый пароль:</label> <input type="password" name="pass1"></li>
+        <li><label>Подтверждение:</label> <input type="password" name="pass2"></li>
+        <li><label>Адрес e-mail:</label> <input type="text" name="email" value="{USER_EMAIL}"></li>
+        <li><label>Пользователь включен:</label> <input type="checkbox" name="active" value="1" {USER_ACTIVE_CHK} {USER_ACTIVE_DIS}> этот пользователь может входить на сайт</li>
+        <li><label>Gravatar:</label> {GRAVATAR}&nbsp;</li>
+    </ul>
+</div>
+<div class="tab">
+    <ul>
+        <li><label><strong>Супер-пользователь:</strong></label> <input type="checkbox" name="super" value="1" {SUPER_CHK} {SUPER_DIS}> неограниченный доступ к сайту</li>
+        <!-- BEGIN group -->
+        <li><label>{GROUP_NAME}:</label> <input type="checkbox" name="groups[]" value="{GROUP_ID}" {GROUP_CHK}></li>
+        <!-- END group -->
+    </ul>
+</div>
+
+<div style="padding: 10px; margin: 10px; text-align: center;">    
+    <input type="submit" value="Сохранить пользователя" class="bigbutton" id="bigbtn">
+</div>
+
+</form>
+
+</div>
+
+<!-- INCLUDE footer.inc.html --> 

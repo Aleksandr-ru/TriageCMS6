@@ -1,0 +1,186 @@
+<!-- INCLUDE header.inc.html -->
+
+<style type="text/css">
+    .panel { margin: 5px; padding: 5px; background-color: #eee; border: solid 1px #ccc; }
+    .panel_white { margin: 5px; padding: 5px; background-color: #fff; border: solid 1px #ccc; }
+    
+    .folders ul { list-style-type: none; margin: 0; padding: 0; }
+    .folders li { background: url('images/icons/16/folder.png') 4px 4px no-repeat; padding: 4px; padding-left: 24px; font-weight: normal; }
+    .folders li.selected { font-weight: bold; }
+    .folders li.open { background-image: url('images/icons/16/folder_magnify.png'); }
+    .folders a { color: #000; text-decoration: none; }
+    
+    .panel_white table { background-color: #cdcdcd; width: 100%; margin: 10px 0; }    
+    .panel_white table tr { background-color: #fff; }
+    
+    .folder .name { padding-left: 24px; background: url('images/icons/16/folder.png') 4px center no-repeat; font-weight: bold; width: 100%;  }
+    .folder a { color: #000; text-decoration: none; }
+    .folder input[type=text] { width: 40%; }
+    /*
+    .file .name { padding-left: 24px; background: url('images/icons/16/page_white.png') 4px center no-repeat; font-weight: bold; width: 100%; }
+    
+    .html .name, .htm .name { background-image: url('images/icons/16/page_white_world.png'); } 
+    .css .name, .xml .name { background-image: url('images/icons/16/page_white_code.png'); }
+    .js .name { background-image: url('images/icons/16/page_white_code_red.png'); }
+    .zip .name, .rar .name, .tar .name, .gz .name { background-image: url('images/icons/16/page_white_compressed.png'); }
+    .sql .name, .db .name { background-image: url('images/icons/16/page_white_database.png'); }
+    .xls .name { background-image: url('images/icons/16/page_white_excel.png'); }
+    .swf .name, .fla .name { background-image: url('images/icons/16/page_white_flash.png'); }
+    .htaccess .name { background-image: url('images/icons/16/page_white_gear.png'); }
+    .htpasswd .name { background-image: url('images/icons/16/page_white_key.png'); }
+    .php .name { background-image: url('images/icons/16/page_white_php.png'); }
+    .jpg .name, .jpeg .name, .bmp .name, .gif .name, .png .name, .psd .name, .ico .name { background-image: url('images/icons/16/page_white_picture.png'); }
+    .ppt .name { background-image: url('images/icons/16/page_white_powerpoint.png'); }
+    .txt .name, .rtf .name { background-image: url('images/icons/16/page_white_text.png'); }
+    .doc .name, .docx .name { background-image: url('images/icons/16/page_white_text.png'); }
+    */
+    .file .name { padding-left: 24px; background: url('images/icons/16/page_white.png') 4px center no-repeat; font-weight: bold; width: 100%; }
+    .file .size { text-align: right; white-space: nowrap; }
+    .file .download { background: url('images/icons/16/page_save.png') center center no-repeat; }
+    .file .edit { background: url('images/icons/16/pencil.png') center center no-repeat; }
+    
+    #newfolder { display: none; }    
+    
+    .upload_form { display: none; }
+    #file_inputs { margin: 10px 0; }
+    #file_inputs div { margin: 2px 0; }
+    #file_inputs input[type=file] { width: 50%; }
+    #file_inputs input[type=submit] { font-weight: bold; }
+</style>
+<link rel="stylesheet" type="text/css" href="templates/filetypes.css">
+
+<script type="text/javascript">
+      
+    $(document).ready(function(){
+        $(".panel_white tr").mouseover(function(){ $(this).css("background-color", "#F0FAE8"); });
+        $(".panel_white tr").mouseout(function(){ $(this).css("background-color", ""); });        
+        
+        $("#create_folder").click(function(){ $("#newfolder").show().find("input[type=text]").focus(); });
+        $("#create_cancel").click(function(){ $("#newfolder").hide(); });
+        
+        $("tr.folder .name").click(function(){ 
+            var href = $(this).find("a:first").attr("href");
+            if(href) window.location.href = href; 
+        });
+        
+        $("#show_upload").click(function(){ $(".upload_form").slideDown("slow"); });
+        $("#hide_upload").click(function(){ $("#upload_form input.clear_file").each(function(){ $(this).trigger("click"); }); $(".upload_form").slideUp("slow"); });
+        
+        $("#upload_form input.clear_file").live("click", function(){
+            /*var html = $(this).parent("div").html();
+            $(this).parent("div").html(html);*/
+            var html = $(this).parent().html();
+            $(this).parent().html(html);
+        });
+        
+        /* $("#file_more").click(function(){
+            $("#file_inputs").find("div:last").clone().appendTo("#file_inputs");
+            $("#file_inputs").find("div:last input.clear_file").click();
+        }); */
+    });
+    
+</script>
+
+<!-- BEGIN error -->
+<div class="error">
+    <strong>{ERROR_TITLE}</strong><br>
+    {ERROR_TEXT}
+</div>
+<!-- END error -->
+
+<!-- BEGIN warning -->
+<div class="warning">
+    <strong>{WARNING_TITLE}</strong><br>
+    {WARNING_TEXT}
+</div>
+<!-- END warning -->
+<!-- BEGIN notice -->
+<div class="notice">
+    <strong>{NOTICE_TITLE}</strong><br>
+    {NOTICE_TEXT}
+</div>
+<!-- END notice -->
+
+<div style="float: left; width: 25%">
+    <div class="panel folders">        
+        <ul>
+            <li class="selected {ROOT_CLASS}"><a href="filemanager.php?path=/">/ (корневая папка)</a>
+                {FOLDER_TREE}
+            </li>
+        </ul>
+    </div>    
+    
+    
+</div>
+
+<div style="float: left; width: 75%">
+    <div class="panel_white">
+    <div>
+        <img src="images/icons/16/folder_magnify.png" width="16" height="16" border="0" align="absmiddle"> {FOLDER}
+    </div>
+    
+    <form method="post" action="">
+    <table align="center" cellpadding="4" cellspacing="1">
+    <tr class="folder">        
+        <td class="name" colspan="4"><a href="filemanager.php?path={UP_PATH}">..</a></td>        
+        <td><input type="checkbox" disabled="disabled"></td>
+    </tr>
+    <!-- BEGIN folder -->
+    <tr class="folder">        
+        <td class="name" colspan="4"><a href="filemanager.php?path={FOLDER_PATH}">{FOLDER_NAME}</a></td>        
+        <td><input type="checkbox" name="del[]" value="{FOLDER_NAME}"></td>
+    </tr>
+    <!-- END folder -->
+    <tr class="folder" id="newfolder">        
+        <td class="name" colspan="4"><input type="text" name="newfoldername"> <input type="submit" name="create_folder" value="создать папку"> <input type="button" value="отмена" id="create_cancel"></td>        
+        <td><input type="checkbox" disabled="disabled"></td>
+    </tr>
+    <!-- BEGIN file -->
+    <tr class="file fileicon">        
+        <td class="file name {FILE_CLASS}">{FILENAME}</td>
+        <td class="size">{FILESIZE}</td>
+        <td class="download"><a title="Скачать" href="filemanager_get.php?file={FILEPATH}"><img src="images/spacer.gif" width="16" height="16" border="0"></a></td>
+        <td class="edit"><a title="Редактировать" href="fileditor.php?file={FILEPATH}"><img src="images/spacer.gif" width="16" height="16" border="0"></a></td>
+        <td><input type="checkbox" name="del[]" value="{FILENAME}"></td>
+    </tr>
+    <!-- END file -->
+    </table>
+    <div style="float: left; width: 50%;"><input type="button" value="новая папка" id="create_folder"> <input type="button" value="загрузить файл(ы)" id="show_upload"></div>
+    <div style="float: left; width: 50%; text-align: right;"><input type="submit" name="delete" value="удалить отмеченные" onclick="if(!confirm('Удалить?')) return false;"></div>
+    <div class="clear"></div>
+    </form>
+    </div>
+    
+    <div class="panel upload_form">
+        <form id="upload_form" method="post" action="" enctype="multipart/form-data">
+        <strong>Загрузить файлы на сервер</strong>
+        
+        <div id="file_inputs">
+            <span>
+                <input type="file" name="userfile[]" multiple><input type="button" value="X" title="Очистить" class="clear_file">
+            </span>
+            <input type="submit" value="Загрузить" name="upload">
+            <input type="button" value="Закрыть" id="hide_upload">            
+        </div>    
+        
+        <div>
+            <input type="checkbox" name="overwrite" value="1"> перезаписать файлы при совпадении имен
+        </div>
+        
+        <!-- div style="text-align: center; margin: 10px 0;">
+            <input type="button" value="Еще файл" id="file_more">
+            <input type="submit" value="Загрузить" name="upload">
+            <input type="button" value="Закрыть" id="hide_upload">
+        </div -->
+        
+        <p>* размер загружаемого файла не должен превышать {INI_MAX_FILEZIE};</p>
+        <p>** суммарный размер всех загружаемых файлов не должен превышать {INI_POST_MAXSIZE};</p>
+        <p>Для загрузки файлов большего размера пользуйтесь FTP.</p>
+        
+        </form>
+    </div>
+    
+</div>
+<div class="clear"></div>
+
+<!-- INCLUDE footer.inc.html -->

@@ -1,0 +1,279 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<title>Triage CMS - {TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; Charset=utf-8">
+<meta http-equiv="Content-Language" content="ru">
+<meta name="Author" content="Rebel">
+
+<script type="text/javascript" src="../scripts/jquery.js"></script>
+
+<style type="text/css">    
+    div { border: solid 0 red; }
+    .clear { clear: both; }
+    
+    body { padding: 0; margin: 0; background-color: #6a6a6a; }
+    body, p, td { font-Family: Tahoma; font-size: 12px; }
+    img { border: 0; }
+    
+    #head { background: url('images/bg_top.gif') top repeat-x; height: 56px; }
+    #head div { background: url('images/logo6.gif') no-repeat; padding: 20px 10px 0 270px; font-Family: Tahoma; font-size: 18px; font-weight: normal; color: #fff; }
+    #body { background-color: #fff; padding: 10px; min-height: 600px; }
+    #foot { background: url('images/greenline.gif') top repeat-x; padding: 20px 10px 10px 10px; text-align: center; }
+    #foot input { font-size: 18px; min-width: 5em; }
+    
+    div.error { border: double 4px red; margin: 15px 5px; background: #FFF0F0 url('images/exclamation.png') 10px 10px no-repeat; padding: 10px; padding-left: 36px; line-height: 150%; }
+    div.warning { border: double 4px #C0C000; margin: 15px 5px; background: #FFFFE5 url('images/error.png') 10px 10px no-repeat; padding: 10px; padding-left: 36px; line-height: 150%; }
+    div.notice { border: double 4px #6179A5; margin: 15px 5px; background: #E7EAEF url('images/information.png') 10px 10px no-repeat; padding: 10px; padding-left: 36px; line-height: 150%; }
+    .error a, .warning a, .notice a { color: #000; text-decoration: none; border-bottom: dashed 1px gray; } 
+    .error a:hover, .warning a:hover, .notice a:hover { color: #000; text-decoration: none; border-bottom: solid 1px gray; }
+    .error b, .warning b, .notice b { display: block; }
+    .error ul, .warning ul, .notice ul { margin-left: 0; padding-left: 1em; }
+    
+    .container { width: 600px; height: 600px; /*margin: 0 auto;*/ overflow: hidden; position: fixed; left: 50%; margin-left: -300px; background-color: #fff; }
+    .container ul.step_pages { list-style-type: none; margin: 0; padding: 0; position: absolute; top: 0; left: 0; width: 3600px; height: 600px; }
+    .container ul.step_pages li.step { margin: 0; padding: 0; float: left; }
+    .container .step { width: 600px; height: 600px; overflow: auto; }
+    
+    #loader { position: absolute; border: solid 1px gray; background: #eee url('images/ajax-loader.gif') 5px 5px no-repeat; padding: 14px; padding-left: 45px; font-weight: bold; top: 50%; left: 50%; margin-left: -100px; margin-top: -20px; display: none; }
+    
+    form ul { margin: 0; padding: 0; list-style-type: none; }
+    form ul li { margin: 10px; clear: both; }
+    form ul li label { float: left; width: 20em; margin-right: 1em; font-weight: bold; }
+    form ul li label.ok { background: url('images/accept.png') right center no-repeat; }
+    form ul li label.err { background: url('images/error.png') right center no-repeat; }
+    form fieldset { border: 0; border-top: solid 1px #eee;  }
+    form fieldset legend { color: gray; font-size: 16px; }
+    
+    .license { color: #cccccc; text-align: center; }
+    .license a { color: white; }    
+</style>
+
+<script type="text/javascript">        
+    var step = 1;
+        
+    $(document).ready(function(){        
+        $("#back").click(function(){ 
+            step_back();
+        });
+        $("#next").click(function(){ 
+            var form = $(".step").eq(step-1).find("form");
+            var err   = $(".step").eq(step-1).find("div.error"); 
+            if(form.length && form.attr("action")) {
+                $("#loader").show();
+                form.submit();
+            } 
+            else if(!err.length) step_next(); 
+        });
+        
+        $("form").submit(function(){            
+            var serialized = $(this).serializeArray();
+            
+            if($(this).attr("id")=="form4"){
+                serialized = $("#form2, #form3, #form4").serializeArray();    
+            }  
+            
+            $(this).next(".result").load($(this).attr("action"), serialized, function(data){                                
+                $("#loader").hide();
+                if(data == 'OK') {
+                    $(this).html('');                    
+                    step_next();
+                } 
+            });
+            return false;
+        });
+        
+    });
+    
+    function step_next()
+    {
+        var new_step = step + 1;
+        
+        if( $(".container ul").is(":animated") || $("#loader").is(":visible") ) return false;
+        if(new_step > $(".step").length){
+            window.location.href = "../cpl/";
+            return false;    
+        }
+        $(".container ul").animate({left: -1*600*(new_step-1)}, "slow");
+        step = new_step;    
+    }
+    
+    function step_back()
+    {
+        var new_step = step - 1;
+        
+        if( $(".container ul").is(":animated") || $("#loader").is(":visible") ) return false;
+        if(new_step < 1) return false;
+        $(".container ul").animate({left: -1*600*(new_step-1)}, "slow");
+        step = new_step;    
+    }
+</script>
+
+</head>
+
+<body>
+
+<div id="head">
+    <div>Установка CMS</div>
+</div>
+
+<div id="body">
+
+    <div class="container">
+        <ul class="step_pages">
+            <li class="step">
+                <h2>Шаг 1. Подготовка к установке</h2>
+                <form method="post" action="" id="form1">
+                    <fieldset>
+                        <legend>Параметры сервера</legend>
+                        <ul>
+                            <li><label class="{SERVER_SOFTWARE_CLASS}">Серверное ПО:</label> {SERVER_SOFTWARE}</li>
+                            <li><label class="{MOD_REWRITE_CLASS}">mod_rewrite:</label> {MOD_REWRITE}</li>
+                            <li><label class="{PHP_CLASS}">Версия PHP:</label> {PHP}</li>
+                            <li><label class="{MYSQL_CLASS}">Версия MySQL:</label> {MYSQL}</li>
+                            <li><label class="{ORACLE_CLASS}">Поддержка Oracle:</label> {ORACLE}</li>
+                        </ul>
+                    </fieldset>
+                    
+                    <fieldset>
+                        <legend>Параметры системы</legend>
+                        <ul>
+                            <li><label class="{OLD_CONFIG_CLASS}">Старая конфигурация:</label> {OLD_CONFIG}</li>
+                            <li><label class="{CONFIG_WRITE_CLASS}">Запись новой конфигурации:</label> {CONFIG_WRITE}</li>
+                            <li><label class="{TEMPLATE_WRITE_CLASS}">Запись шаблонов страниц:</label> {TEMPLATE_WRITE}</li>
+                            <li><label class="{FILES_WRITE_CLASS}">Запись файлов пользователя:</label> {FILES_WRITE}</li>                                           
+                        </ul>
+                    </fieldset>
+                </form>
+                <div class="result">
+                    <!-- BEGIN error -->
+                    <div class="error"><b>Невозможно приступить к установке</b><ul>{ERR_LIST}</ul></div>
+                    <!-- END error -->
+                    <!-- BEGIN warning -->
+                    <div class="warning"><b>Обратите внимание</b><ul>{WARN_LIST}</ul></div>
+                    <!-- END warning -->
+                    <!-- BEGIN notice -->
+                    <div class="notice"><b>Можно переходить к следующему шагу</b>Нажмите кнопку &quot;Продолжить&quot;.</div>
+                    <!-- END notice -->
+                </div>
+            </li>
+            <li class="step">
+                <h2>Шаг 2. Подключение к БД</h2>
+                <form method="post" action="step2.php" id="form2">
+                    <fieldset>
+                        <legend>Параметры подключения к MySQL</legend>
+                        <ul>
+                            <!-- li><label>Тип базы данных:</label>
+                                <select name="db_class" id="db_class">
+                                    <option value="DB_MySQL">MySQL</option>
+                                </select>
+                            </li -->
+                            <input type="hidden" name="db_class" value="DB_MySQL">
+                            <li><label>Адрес сервера:</label> <input type="text" name="db_host" id="db_host" value="localhost"></li>
+                            <li><label>Порт:</label> <input type="text" name="db_port" id="db_port" value="3306"></li>
+                            <li><label>Пользователь:</label> <input type="text" name="db_login" id="db_login" value="root"></li>
+                            <li><label>Пароль:</label> <input type="password" name="db_password" id="db_password"></li>
+                        </ul>
+                    </fieldset>
+                    
+                    <fieldset>
+                        <legend>Дополнительные параметры</legend>
+                        <ul>
+                            <li><label>Название базы данных:</label> <input type="text" name="db_name" id="db_name"></li>
+                            <li><label>Требуется создать базу:</label> <input type="checkbox" name="db_create" id="db_create" value="1"></li>
+                            <li><label>Префикс таблиц CMS:</label> <input type="text" name="table_prefix" id="table_prefix" value="cms_"></li>                                           
+                        </ul>
+                    </fieldset>
+                    
+                    <!-- BEGIN ora -->
+                    <fieldset>                        
+                        <!-- input type="hidden" name="is_oracle" value="1" -->
+                        <legend>Параметры подключения к Oracle</legend>
+                        <ul>                            
+                            <li><label>Настроить подключение к Oracle:</label> <input type="checkbox" name="is_oracle" value="1" checked="checked"></li>
+                            <li><label>База данных:</label> <input type="text" name="ora_db" id="ora_db" value=""></li>
+                            <li><label>Схема:</label> <input type="text" name="ora_schema" id="ora_schema" value=""></li>
+                            <li><label>Пользователь:</label> <input type="text" name="ora_login" id="ora_login" value=""></li>
+                            <li><label>Пароль:</label> <input type="password" name="ora_password" id="ora_password"></li>
+                        </ul>
+                    </fieldset>
+                    <!-- END ora -->
+                </form>
+                <div class="result"></div>
+            </li>
+            <li class="step">
+                <h2>Шаг 3. Конфигурация CMS</h2>
+                <form method="post" action="step3.php" id="form3">
+                    <fieldset>
+                        <legend>Параметры конфигурации</legend>
+                        <ul>                            
+                            <li><label>Папка размещения CMS на сервере:</label> <input type="text" name="document_root" id="document_root" value="{DOCUMENT_ROOT}" readonly="readonly"></li>
+                            <li><label>Базовый URL сайта:</label> <input type="text" name="http_base" id="http_base" value="{HTTP_BASE}"></li>
+                            <li><label>Префикс хранимых Cookie:</label> <input type="text" name="cookie_prefix" id="cookie_prefix" value="cms_"></li>
+                        </ul>
+                    </fieldset>
+                    
+                    <fieldset>
+                        <legend>Учетная запись администратора</legend>
+                        <ul>
+                            <li><label>Логин:</label> <input type="text" name="user_login"></li>
+                            <li><label>Пароль:</label> <input type="password" name="user_pass1"></li>
+                            <li><label>Подтверждение пароля:</label> <input type="password" name="user_pass2"></li>
+                            <li><label>Адрес e-mail:</label> <input type="text" name="user_email"></li>
+                        </ul>
+                    </fieldset>
+                </form>
+                <div class="result"></div>
+            </li>
+            <li class="step">
+                <h2>Шаг 4. Завершение установки</h2>
+                <p>Сейчас собраны все необходимые конфигурационные параметры для установки CMS.</p>
+                <p>На следующем шаге будет записана конфигурация для работы системы и произведены операции по заполнению базы данных начальными данными.</p>
+                <form method="post" action="step4.php" id="form4">
+                    <fieldset>
+                        <legend>Демонстрационное заполнение</legend>
+                        <ul>
+                            <li>Для ознаколмения с возможностями системы можно включить заполнение демонстрционными данными (будет добавлен 1 простой шаблон и 1 страница).</li>
+                            <li><label>Внести демонстрационные данные:</label> <input type="checkbox" name="demo_data"></li>                            
+                        </ul>
+                    </fieldset>
+                    
+                    <fieldset>
+                        <legend>Защита</legend>
+                        <ul>
+                            <li>Для повышения стойкости системы к различным атакам и вирусам рекомендуется защитить от записи файлы CMS. Эта опция может не действовать на некоторых хостингах.</li>
+                            <li><label>Защитить от записи файлы CMS:</label> <input type="checkbox" name="write_protect" checked="checked" /></li>                            
+                        </ul>
+                    </fieldset>
+                </form>                
+                <div class="result">
+                    <div class="notice"><b>Все готово для установки</b>Нажмите кнопку &quot;Продолжить&quot; для завершения установки.</div>
+                </div>
+            </li>
+            <li class="step">
+                <h2>Установка завершена</h2>
+                <p>Установка системы Triage CMS успешно завершена. Вы можете перейти в <a href="../cpl/">панель управления сайтом</a> и войти со своим логином и паролем. Если у Вас возникнут вопросы по управлению сайтом, обратитесь к разделу 'Помощь' в панели управления.</p>
+                <p>Рекомендуется удалить папку 'cms/install/', а на папку 'cms/cpl/' установить дополнительную автоизацию средствами сервера, для повышения безопасности системы.</p>
+                <p>Благодарим за выбор Triage CMS!</p>
+                
+                <div class="result">
+                    <div class="notice"><b>Поздравляем!</b>Система успешно установлена.</div>
+                </div>
+            </li>
+        </ul>
+        <div id="loader">Пожалуйста ждите...</div>
+    </div>
+
+</div>
+
+<div id="foot">
+    <input type="button" id="back" value="&larr; Назад">
+    <input type="button" id="next" value="Продолжить &rarr;">
+    <div class="license">
+        <p>Перед началом установки обязательно ознакомьтесь с <a href="../license.txt" target="_blank">лицензионным соглашением</a>.</p>
+    </div>    
+</div>
+
+</body>
+</html>

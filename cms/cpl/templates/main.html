@@ -1,0 +1,81 @@
+<!-- INCLUDE header.inc.html -->
+
+<style type="text/css">
+    .container { width: 920px; margin: 70px auto; }
+    .block { width: 300px; min-height: 250px; float: left; background: url('images/spacer.gif') left top no-repeat; padding: 10px; padding-left: 140px; padding-right: 20px; }
+    .block .title { display: block; font-size: 28px; }
+    .block a { color: blue; text-decoration: none; border-bottom: dashed 1px blue; }
+    .struct { background-image: url('images/icons/128/sites.png'); }
+    .materials { background-image: url('images/icons/128/document.png'); }
+    .plugins { background-image: url('images/icons/128/meta_package.png'); clear: left; }
+    .log { background-image: url('images/icons/128/ical.png'); }
+    
+    .block ul { margin: 10px 0; padding: 0; list-style-type: none; }
+    .block ul li { background: url('images/spacer.gif') 4px 4px no-repeat; padding: 4px; padding-left: 24px; white-space: nowrap; overflow: hidden; }
+    .block ul li a { color: black; text-decoration: none; border: none; }
+    .block ul li a:hover { text-decoration: none; border-bottom: dashed 1px black; }
+    .plugins ul li { background-image: url('images/icons/16/plugin.png'); }
+    .log ul li { background-image: url('images/icons/16/date.png'); }
+    .struct ul li { background-image: url('images/icons/16/page.png'); }
+    .materials ul li { }
+    
+    .plugins ul li a { font-weight: bold; }
+    .plugins li.noplugins { background-image: url('images/icons/16/plugin_disabled.png'); }
+            
+    .struct li.inactive { background-image: url('images/icons/16/page_gray.png'); }
+    
+    .materials li.text { background-image: url('images/icons/16/page_white_text.png'); }
+    .materials li.html { background-image: url('images/icons/16/page_white_world.png'); }
+    .materials li.css { background-image: url('images/icons/16/page_white_code.png'); }
+    .materials li.javascript { background-image: url('images/icons/16/page_white_code_red.png'); }
+    .materials li.plugin { background-image: url('images/icons/16/page_white_gear.png'); }      
+    .materials li.inactive a { color: gray; }
+</style>
+<div class="container">
+    <div class="block struct">
+        <div class="title">Структура</div>
+        Последние добавленные страницы:
+        <ul>
+            <!-- BEGIN page -->
+            <li title="{PAGE_TITLE}" class="{PAGE_CLASS}"><a href="struct.php?page_id={PAGE_ID}">{PAGE_NAME}</a></li>
+            <!-- END page -->
+        </ul>
+        <a href="struct.php">Полная структура сайта</a>
+    </div>
+    <div class="block materials">
+        <div class="title">Материалы</div>
+        Последние добавленные материалы:
+        <ul>
+            <!-- BEGIN material -->
+            <li title="{MATERIAL_GROUP}" class="{MATERIAL_TYPE} {MATERIAL_CLASS}"><a href="material.php?material_id={MATERIAL_ID}">{MATERIAL_NAME}</a></li>
+            <!-- END material -->
+        </ul>
+        <a href="materials.php">Все материалы</a>
+    </div>
+    <div class="block plugins">
+        <div class="title">Плагины</div>
+        Вам доступны для управления следующие плагины:
+        <ul>
+            <!-- BEGIN plugin -->
+            <li title="{PLUGIN_DESC}"><a href="plugin.php?plugin_uid={PLUGIN_UID}">{PLUGIN_TITLE}</a></li>
+            <!-- END plugin -->
+            <!-- BEGIN noplugins -->
+            <li class="noplugins">Нет доступных плагинов</li>
+            <!-- END noplugins -->
+        </ul>
+        <a href="plugins.php">Перейти в раздел &quot;Плагины&quot;</a>
+    </div>
+    <div class="block log">
+        <div class="title">События</div>
+        Здесь Вы видите последнюю активность в системе
+        <ul>
+            <!-- BEGIN syslog -->
+            <li title="{LOG_DATE}, {LOG_USER}, {LOG_TEXT}">{LOG_TEXT}</li>
+            <!-- END syslog -->            
+        </ul>
+        <a href="syslog.php">Смотреть все события</a>
+    </div>
+    <div class="clear"></div>
+</div>
+
+<!-- INCLUDE footer.inc.html -->

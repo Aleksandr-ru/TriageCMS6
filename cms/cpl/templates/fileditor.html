@@ -1,0 +1,106 @@
+<!-- INCLUDE header.inc.html -->
+
+<style type="text/css">           
+    .panel textarea { width: 100%; height: 70%; }
+    .panel input[type=submit], .panel input[type=reset] { font-size: 18px; }
+</style>
+
+<script type="text/javascript" src="../scripts/jquery.tabby.js"></script>
+<script type="text/javascript" src="../editor/codemirror/js/codemirror.js"></script>
+<script type="text/javascript">
+    var use_codemirror = {USE_CODEMIRROR};
+    var file_type      = '{FILE_TYPE}';
+    
+    var editor;
+              
+    $(document).ready(function(){
+        
+        if(use_codemirror) {
+            
+            switch(file_type)
+            {
+                case 'js':
+                    editor = CodeMirror.fromTextArea( $(".panel textarea").wrap('<div class="codeBorder"></div>').get(0) , {                
+                        height: "600px",
+                        parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
+                        stylesheet: ["../editor/codemirror/css/jscolors.css"],
+                        path: "../editor/codemirror/js/"   
+                    });   
+                    break;
+                case 'css':
+                    editor = CodeMirror.fromTextArea( $(".panel textarea").wrap('<div class="codeBorder"></div>').get(0) , {                
+                        height: "600px",
+                        parserfile: ["parsecss.js"],
+                        stylesheet: ["../editor/codemirror/css/csscolors.css"],
+                        path: "../editor/codemirror/js/"   
+                    });   
+                    break;
+                /*
+                case 'php':
+                    editor = CodeMirror.fromTextArea( $(".panel textarea").wrap('<div class="codeBorder"></div>').get(0) , {                
+                        height: "600px",
+                        parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "../contrib/php/js/tokenizephp.js", "../contrib/php/js/parsephp.js", "../contrib/php/js/parsephphtmlmixed.js"],
+                        stylesheet: ["../../css/xmlcolors.css", "../../css/jscolors.css", "../../css/csscolors.css", "css/phpcolors.css"],
+                        path: "../editor/codemirror/js/"   
+                    });   
+                    break;
+                */
+                case 'html':
+                default:
+                    editor = CodeMirror.fromTextArea( $(".panel textarea").wrap('<div class="codeBorder"></div>').get(0) , {                
+                        height: "600px",
+                        parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
+                        stylesheet: ["../editor/codemirror/css/xmlcolors.css", "../editor/codemirror/css/jscolors.css", "../editor/codemirror/css/csscolors.css"],
+                        path: "../editor/codemirror/js/"   
+                    });   
+            }                     
+        }
+        else {
+            $(".panel textarea").tabby();
+        } 
+        
+        $("#back_btn").click(function(){
+            window.location.href = $("#back").val();
+        });   
+    });
+    
+</script>
+
+<!-- BEGIN error -->
+<div class="error">
+    <strong>{ERROR_TITLE}</strong><br>
+    {ERROR_TEXT}
+</div>
+<!-- END error -->
+
+<!-- BEGIN warning -->
+<div class="warning">
+    <strong>{WARNING_TITLE}</strong><br>
+    {WARNING_TEXT}
+</div>
+<!-- END warning -->
+<!-- BEGIN notice -->
+<div class="notice">
+    <strong>{NOTICE_TITLE}</strong><br>
+    {NOTICE_TEXT}
+</div>
+<!-- END notice -->
+
+<div class="panel">   
+    <form method="post" action="fileditor_save.php">
+    <input type="hidden" name="file" value="{FILENAME}">
+    <input type="hidden" name="back" value="{BACK}" id="back">     
+    <div style="margin: 10px 0;">Редактирование файла <strong>{FILENAME}</strong></div>
+    
+    <div style="margin: 10px 0;">
+        <textarea name="file_data">{FILE_DATA}</textarea>
+    </div>
+    <div style="margin: 10px 0; text-align: center;">
+        <input type="submit" value="Сохранить">
+        <input type="reset" value="Назад" id="back_btn">
+    </div>
+    </form>
+</div>    
+
+
+<!-- INCLUDE footer.inc.html -->

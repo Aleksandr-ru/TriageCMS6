@@ -1,0 +1,189 @@
+<style type="text/css">
+    .plugin_head select { max-width: 500px; }
+    
+    .addr {}
+    .addr .name input { width: 20em; }
+    .addr .email input { width: 15em; }
+    .addr .sort input { width: 4em; }
+    
+    .field .name input { width: 10em; }
+    .field .type select { width: 5em; }
+    .field .default input { width: 10em; }
+    .field .value input { width: 8em; }
+    .field .value select { width: 5em; }
+    .field .sort input { width: 4em; }
+    
+    .help { cursor: help; border-bottom: dotted 1px; }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".field .value select").change(function(){        
+            $(this).prev("input").val($(this).val());                
+        });    
+    });    
+</script>
+
+<div class="plugin_head">
+    <form method="get">
+        <input type="hidden" name="plugin_uid" value="sendemail">
+        <select name="material_id" {NOMATERIAL_DIS}>
+            {MATERIAL_OPTIONS}
+        </select>
+        <input type="submit" value="Выбрать" {NOMATERIAL_DIS}>
+    </form>
+</div>
+
+<div class="plugin_body">
+    <form method="post" action="plugin.php?plugin_uid=sendemail&event=save_emails">
+        <input type="hidden" name="material_id" value="{MATERIAL_ID}">
+        <table class="t1 addr">
+        <thead>
+            <tr>
+                <td colspan="4"><h2>Варианты адресатов</h2></td>
+            </tr>
+        </thead>
+        <tr>
+            <th>Название</th>
+            <th>Адрес e-mail</th>
+            <th><span class="help" title="от 1 до 9999, если 0 - не использовать">Сортировка</span></th>
+            <th>Удалить</th>
+        </tr>
+        <!-- BEGIN emailrow -->
+        <tr>
+            <td class="name"><input type="text" name="email_name[{EMAIL_ID}]" value="{EMAIL_NAME}"></td>
+            <td class="email"><input type="text" name="email_email[{EMAIL_ID}]" value="{EMAIL_EMAIL}"></td>
+            <td class="sort"><input type="text" name="email_sort[{EMAIL_ID}]" value="{EMAIL_SORT}"></td>
+            <td class="center">
+                <input type="checkbox" name="email_del[]" value="{EMAIL_ID}">
+                <input type="hidden" name="email_id[]" value="{EMAIL_ID}">
+            </td>
+        </tr>
+        <!-- END emailrow -->
+        <tfoot>
+            <tr>
+                <td colspan="4"><h3>Добавить</h3></td>
+            </tr>
+            <tr>
+                <td class="name"><input type="text" name="new_name" {NOMATERIAL_DIS}></td>
+                <td class="email"><input type="text" name="new_email" {NOMATERIAL_DIS}></td>
+                <td class="sort"><input type="text" name="new_sort" value="10" {NOMATERIAL_DIS}></td>
+                <td class="center">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <input type="checkbox" name="clear" {NOMATERIAL_DIS}> удалить все адреса (будут использоваться данные из настроек плагина)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4"><input type="submit" value="Сохранить изменения" {NOMATERIAL_DIS}></td>
+            </tr>
+        </tfoot>
+        </table>
+    </form>
+    
+    <form method="post" action="plugin.php?plugin_uid=sendemail&event=save_fields">
+        <input type="hidden" name="material_id" value="{MATERIAL_ID}">
+        <table class="t1 field">
+        <thead>
+            <tr>
+                <td colspan="7"><h2>Дополнительные поля</h2></td>
+            </tr>
+        </thead>
+        <tr>
+            <th>Название</th>
+            <th>Тип</th>
+            <th><span class="help" title="Для выпадающих списков, флажков и переключателей - список значений через точку с запятой (;)">По-умолчанию</span></th>
+            <th><span class="help" title="Perl-совместимое регулярное выражение">Допустимые значения</span></th>
+            <th><span class="help" title="Подставлять значение поля в тему письма">В тему</span></th>
+            <th>Обязательное</th>            
+            <th><span class="help" title="от 1 до 9999, если 0 - не использовать">Сортировка</span></th>
+            <th>Удалить</th>
+        </tr>
+        <!-- BEGIN fieldrow -->
+        <tr>
+            <td class="name"><input type="text" name="field_name[{FIELD_ID}]" value="{FIELD_NAME}"></td>
+            <td class="type">
+                <select name="field_type[{FIELD_ID}]">
+                    <option value="text" {SEL_TEXT}>Текстовое поле (text)</option>
+                    <option value="textarea" {SEL_TEXTAREA}>Многострочное поле (textarea)</option>
+                    <option value="select" {SEL_SELECT}>Выпадающий список (select)</option>
+                    <option value="checkbox" {SEL_CHECKBOX}>Флажки (checkbox)</option>
+                    <option value="radio" {SEL_RADIO}>Переключатели (radio)</option>
+                </select>
+            </td>
+            <td class="default"><input type="text" name="field_default[{FIELD_ID}]" value="{FIELD_DEFAULT}"></td>
+            <td class="value">
+                <input type="text" name="field_accept[{FIELD_ID}]" value="{FIELD_ACCEPT}">
+                <select>
+                    <option value="">&larr;</option>
+                    <option value="/.*/">Все</option>
+                    <option value="/.+/">Любые символы</option>
+                    <option value="/^\d+$/">Только цифры (0-9)</option>
+					<option value="/^[a-z]+$/i">Латинские буквы (a-z)</option>
+					<option value="/^[a-z0-9]+$/i">Латинские буквы и цифры</option>
+					<option value="/^[a-z0-9._-]+@[a-z0-9._-]+\.[a-z]{2,4}$/i">Адрес e-mail</option>
+                </select>
+            </td>
+            <td class="center">
+                <input type="checkbox" name="field_subj[]" value="{FIELD_ID}" {FIELD_SUBJ_CHK}>
+            </td>
+            <td class="center">
+                <input type="checkbox" name="field_req[]" value="{FIELD_ID}" {FIELD_REQ_CHK}>
+            </td>
+            <td class="sort"><input type="text" name="field_sort[{FIELD_ID}]" value="{FIELD_SORT}"></td>
+            <td class="center">
+                <input type="checkbox" name="field_del[]" value="{FIELD_ID}">
+                <input type="hidden" name="field_id[]" value="{FIELD_ID}">
+            </td>
+        </tr>
+        <!-- END fieldrow -->
+        <tfoot>
+            <tr>
+                <td colspan="7"><h3>Добавить</h3></td>
+            </tr>
+            <tr>
+                <td class="name"><input type="text" name="new_name" {NOMATERIAL_DIS}></td>
+                <td class="type">
+                    <select name="new_type" {NOMATERIAL_DIS}>
+                        <option value="text">Текстовое поле (text)</option>
+                        <option value="textarea">Многострочное поле (textarea)</option>
+                        <option value="select">Выпадающий список (select)</option>
+                        <option value="checkbox">Флажки (checkbox)</option>
+                        <option value="radio">Переключатели (radio)</option>
+                    </select>
+                </td>
+                <td class="default"><input type="text" name="new_default" {NOMATERIAL_DIS}></td>
+                <td class="value">
+                    <input type="text" name="new_accept" {NOMATERIAL_DIS}>
+                    <select {NOMATERIAL_DIS}>
+                        <option value="">&larr;</option>
+                        <option value="/.*/">Все</option>
+                        <option value="/.+/">Любые символы</option>
+                        <option value="/^\d+$/">Только цифры (0-9)</option>
+    					<option value="/^[a-z]+$/i">Латинские буквы (a-z)</option>
+    					<option value="/^[a-z0-9]+$/i">Латинские буквы и цифры</option>
+    					<option value="/^[a-z0-9._-]+@[a-z0-9._-]+\.[a-z]{2,4}$/i">Адрес e-mail</option>
+                    </select>
+                </td>
+                <td class="center">
+                    <input type="checkbox" name="new_subj" {NOMATERIAL_DIS}>
+                </td>
+                <td class="center">
+                    <input type="checkbox" name="new_req" {NOMATERIAL_DIS}>
+                </td>
+                <td class="sort"><input type="text" name="new_sort" value="10" {NOMATERIAL_DIS}></td>
+                <td class="center">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="7">
+                    <input type="checkbox" name="clear" {NOMATERIAL_DIS}> удалить все поля
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7"><input type="submit" value="Сохранить изменения" {NOMATERIAL_DIS}></td>
+            </tr>
+        </tfoot>
+        </table>
+    </form>
+</div>

@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<title>Triage CMS - {TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; Charset=utf-8">
+<meta http-equiv="Content-Language" content="ru">
+<meta name="Author" content="Rebel">
+
+<script type="text/javascript" src="../scripts/jquery.js"></script>
+<script type="text/javascript" src="../scripts/jquery.scrollTo.js"></script>
+
+<link rel="stylesheet" type="text/css" href="templates/cpl.css">
+
+<style type="text/css">    
+    #dlg_head { background: url('images/bg_top.gif') top repeat-x; height: 56px; }
+    #dlg_head div { background: url('images/logo6.gif') no-repeat; padding: 20px 10px 0 270px; font-Family: Tahoma; font-size: 18px; font-weight: normal; color: #fff; }
+    #dlg_body { background-color: #fff; padding: 10px; height: 400px; overflow: auto; }
+    #dlg_foot { background: url('images/greenline.gif') top repeat-x; padding: 20px 10px 10px 10px; text-align: center; }
+    #dlg_foot input { font-size: 18px; min-width: 5em; }
+</style>
+
+<script type="text/javascript">
+    var callback_func = '{CALLBACK_FUNCTION}';
+    var callback_params = {};
+        
+    $(document).ready(function(){
+        
+        window.resizeTo(500, 600);
+        
+        $("#dlg_foot input").click(function(){
+            // dlg_proc ;)
+            var btn_id = $(this).attr("id");
+            if(window.opener && typeof(eval('window.opener.' + callback_func))=='function')
+            {                
+                var ret = eval('window.opener.' + callback_func + '(btn_id, callback_params)');
+                if(ret) window.close();
+            } 
+            else
+            {
+                alert('Нет родительского окна и/или функции обратного вызова');
+            }
+            
+            return false;
+        });
+    });
+</script>
+
+</head>
+
+<body>
+
+<div id="dlg_head">
+    <div>{TITLE}</div>
+</div>
+
+<div id="dlg_body">
+
+{DIALOG_BODY}
+
+</div>
+
+<div id="dlg_foot">
+    <!-- BEGIN button -->
+    <input type="button" id="{BUTTON_ID}" value="{BUTTON_TEXT}">
+    <!-- END button -->
+</div>
+
+</body>
+</html>

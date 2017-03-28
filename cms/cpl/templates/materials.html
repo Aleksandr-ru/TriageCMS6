@@ -1,0 +1,263 @@
+<!-- INCLUDE header.inc.html -->
+
+<style type="text/css">
+    #materials { width: 1000px; margin-left: auto; margin-right: auto; }
+    #materials ul { margin: 2px; padding: 2px; }
+    #materials li { list-style-type: none; padding: 6px 0 6px 24px; background-position: 4px 4px; background-repeat: no-repeat; }
+    #materials li.folder { background-image: url('images/icons/16/book.png'); font-weight: bold; border: solid 1px #ccc; border-bottom-width: 0; background-color: #eee; }
+    #materials li.folder span.buttons { display: none; }   
+    #materials li.hidden_group { background-image: url('images/icons/16/book_gray.png'); font-weight: bold; }
+    #materials li.nogroup { background-image: url('images/icons/16/book_error.png'); font-weight: bold; font-style: italic; border-bottom-width: 1px; }
+    #materials li.loading { background-image: url('images/icons/16/ajax-loader.gif') !important; font-weight: bold; }
+    #materials li.add { background-image: url('images/icons/16/book_add.png'); }
+    #materials li.addmat { background-image: url('images/icons/16/page_white_add.png'); }
+    #materials li.open { background-image: url('images/icons/16/book_open.png'); background-color: #fff; }
+    #materials li.mat { background-image: url('images/icons/16/page_white.png'); font-weight: normal; font-style: normal; }
+    #materials li.text { background-image: url('images/icons/16/page_white_text.png'); }
+    #materials li.html { background-image: url('images/icons/16/page_white_world.png'); }
+    #materials li.css { background-image: url('images/icons/16/page_white_code.png'); }
+    #materials li.javascript { background-image: url('images/icons/16/page_white_code_red.png'); }
+    #materials li.plugin { background-image: url('images/icons/16/page_white_gear.png'); }
+    #materials li a { color: black; text-decoration: none; }
+    #materials li.inactive a { color: gray; }
+    #materials li.files a { background: url('images/icons/16/attach.png') right center no-repeat; padding-right: 20px; }
+    #materials .sub { display: none; }
+    
+    #materials li a.act img { background: url('images/icons/16/lightbulb.png') center center no-repeat; }
+    #materials li.hidden_group a.act img { background: url('images/icons/16/lightbulb_off.png') center center no-repeat; }
+    a.loading img { background: url('images/icons/16/ajax-loader.gif') center center no-repeat !important; }
+    
+    #materials li.search { /*border: solid 1px #ccc; border-bottom-width: 0; background-color: #eee;*/ padding-left: 4px; white-space: nowrap; }
+    #materials li.search input[type=text] { 
+        background: url('images/icons/16/find.png') 4px center no-repeat; 
+        padding: 3px;
+        padding-left: 22px; 
+        background-color: #fafafa; 
+        border: solid 1px #aaa;
+        border-radius: 3px; 
+        width: 18em;         
+    } 
+    #materials li.search a { font-weight: bold; text-decoration: none; border-bottom: dashed 1px black; }
+    #materials li.mat.match a { background-color: yellow; }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#materials li.folder").live("click", function(){
+			var li = $(this);
+			var sub =  li.find(".sub:first");
+			
+            $("#materials li.folder").removeClass("open");
+            $("#materials li.folder span.buttons").fadeOut("slow");
+            
+			if(sub.is(":visible")) 
+			{
+                sub.slideUp("slow");
+				return false;
+			}
+            else if(sub.html())
+            {
+                $(".sub").slideUp("slow").removeClass("open");
+                li.addClass("open").find("span.buttons").fadeIn("slow");
+                sub.slideDown("slow", function(){                    
+                    //$.scrollTo(sub.find("li.mat.match:first"), "slow");
+                    var a = sub.find("li.mat.match:first");
+                    if(a.length) $.scrollTo(a, "slow");
+                });
+                hilite_materials();
+            }
+			else
+			{
+                $("body").css("cursor", "wait");
+                $(".sub").slideUp("slow").removeClass("open");
+                li.addClass("loading");
+                sub.load("ajax/materials_group_contents.php", {group_id: li.attr("group_id")}, function(){
+                    li.removeClass("loading").addClass("open").find("span.buttons").fadeIn("slow"); 
+                    sub.slideDown("slow", function(){
+                        //$.scrollTo(sub.find("li.mat.match:first"), "slow");
+                        var a = sub.find("li.mat.match:first");
+                        if(a.length) $.scrollTo(a, "slow");
+                    });
+                    $("body").css("cursor", "");
+                    hilite_materials();
+                });				
+			}
+            return false;            				
+		});
+        
+        $("#materials .sub a").live("click", function(){ 
+            window.location.href = $(this).attr("href");
+            return false; 
+        });
+        
+        $("#materials li a.act").click(function(){
+            var grp_id = $(this).attr("href").split("#");
+            grp_id = grp_id[1];
+            
+            $(this).addClass("loading");
+            var li = $(this).parents("li"); 
+            var a = $(this);
+            
+            $.post("ajax/materials_group_activate.php", {group_id: grp_id}, function(data){
+                a.removeClass("loading");
+                if(data)
+                {
+                    alert(data);
+                    return false;
+                }
+                if(li.hasClass("hidden_group")) li.removeClass("hidden_group");
+                else li.addClass("hidden_group");    
+            });
+                        
+            return false;
+        });
+        
+        $("#materials li a.edit").click(function(){
+            var grp_id = $(this).attr("href").split("#");
+            grp_id = grp_id[1];
+            
+            var old_name = $(this).parents("li").find("span.group_name").text();
+            var new_name = prompt('Введите новое название группы:', old_name);
+            
+            if(typeof(new_name) == 'string' && new_name != '' && old_name != new_name)
+            {
+                var li = $(this).parents("li");
+                var name_container = li.find("span.group_name");
+                li.addClass("loading");
+                $.post("ajax/materials_group_rename.php", {group_id: grp_id, group_name: new_name, group_old_name: old_name}, function(data){
+                    li.removeClass("loading");
+                    if(data)
+                    {
+                        alert(data);
+                        return false;
+                    }
+                    name_container.text(new_name);
+                });
+            }
+            
+            return false;
+        });
+        
+        $("#materials li a.del").click(function(){
+            if(confirm('Удалить группу материалов (содержащиеся в ней материалы будут вне групп)?')) window.location.href = $(this).attr("href"); 
+            else return false;
+        });
+        
+        $("#materials li a.addm").click(function(){
+            window.location.href = $(this).attr("href"); 
+        });
+        
+        $("a#addgroup").click(function(){
+            var new_name = prompt('Введите новое название группы:', 'Новая группа материалов');
+            
+            if(typeof(new_name) == 'string' && new_name != '')
+            {
+                $.post("ajax/materials_group_add.php", {group_name: new_name}, function(data){
+                    if(data)
+                    {
+                        alert(data);
+                        return false;
+                    }
+                    window.location.reload();
+                });
+            }
+            
+            return false;
+        });
+        
+        $("#matgrp-{SELECTED_GROUP_ID}").click();
+        
+                
+        $("#materials li.search input[type=text]").focus(function(){
+            $(this).select();            
+        });
+        $("#materials li.search input[type=text]").keypress(function(e){
+            if(e.keyCode == 13) {
+                $("#materials li.search a").click();
+                e.preventDefault();
+                return false;
+            }
+            material_search_groups = new Array();
+            material_search_matches = new Array();
+            material_search_idx = -1;                      
+        });
+        
+        $("#materials li.search a").click(function(){            
+            if(material_search_idx < 0) {                
+                var q;
+                if(q = $("#materials li.search input[type=text]").val()) {                
+                    $.post("ajax/materials_find.php", {q: q}, function(data){                        
+                        if(data != "[object XMLDocument]") {
+                            alert("Ошибка");
+                        } else {                        
+                            material_search_groups = $("groups", data).text().length ?  $("groups", data).text().split(",") : new Array();
+                            material_search_matches = $("materials", data).text().length ?  $("materials", data).text().split(",") : new Array();                            
+                            if(!material_search_groups.length || !material_search_matches.length) {
+                                alert("Ничего не найдено!");
+                                material_search_idx = -1;
+                            } else {
+                                material_search_idx = 0;
+                                var mg = $("#matgrp-" + material_search_groups[material_search_idx]);
+                                if(!mg.find(".sub").is(":visible") || mg.find(".sub").html() == '') mg.click();
+                                else hilite_materials();
+                                material_search_idx++;
+                                if(material_search_idx >= material_search_groups.length) material_search_idx = 0;
+                            }
+                        }
+                    }, "xml");    
+                } 
+            } else {                
+                var mg = $("#matgrp-" + material_search_groups[material_search_idx]);
+                if(!mg.find(".sub").is(":visible") || mg.find(".sub").html() == '') mg.click();
+                else hilite_materials();
+                material_search_idx++;
+                if(material_search_idx >= material_search_groups.length) material_search_idx = 0;
+            }
+            
+            return false;
+        });
+        
+        $(".search input[type=text]").focus();                
+    });
+    
+    var material_search_groups = new Array();
+    var material_search_matches = new Array();
+    var material_search_idx = -1;
+    
+    function hilite_materials()
+    {
+        $("li.mat").removeClass("match");
+        for(var i in material_search_matches) {
+            $("#mat-" + material_search_matches[i]).addClass("match");
+        }
+    }
+</script>
+
+<div id="materials">
+
+<ul>
+    <li class="search">
+        <input type="text" value="Быстрый поиск материала" title="Быстрый поиск материала" />
+        <a href="#search">Найти</a>
+    </li>
+    <!-- BEGIN group -->
+    <li id="matgrp-{GROUP_ID}" class="folder {GROUP_CLASS}" group_id="{GROUP_ID}"><span class="group_name">{GROUP_NAME}</span> ({GROUP_COUNT})
+    <span class="buttons">
+        <a class="act" title="Скрыть/открыть группу" href="#{GROUP_ID}"><img src="images/spacer.gif" width="16" height="16" border="0" align="absmiddle"></a>
+        <a class="edit" title="Редактировать группу" href="#{GROUP_ID}"><img src="images/icons/16/pencil.png" width="16" height="16" border="0" align="absmiddle"></a>
+        <a class="del" title="Удалить группу (отправить в корзину)" href="materials_group_del.php?group_id={GROUP_ID}"><img src="images/icons/16/delete.png" width="16" height="16" border="0" align="absmiddle"></a>
+        <a class="addm" title="Добавить новый материал в эту группу" href="material.php?group_id={GROUP_ID}"><img src="images/icons/16/add.png" width="16" height="16" border="0" align="absmiddle"></a>
+    </span>
+    <div class="sub"></div>
+    </li>
+    <!-- END group -->
+    <li id="matgrp-0" class="folder nogroup" group_id="0">Материалы вне групп ({NOGROUP_COUNT})
+    <div class="sub"></div>
+    </li>
+    <li class="add"><a id="addgroup" href="#">Добавить группу материалов</a></li>
+    <li class="addmat"><a href="material.php">Добавить материал</a></li>
+</ul>
+
+</div>
+
+<!-- INCLUDE footer.inc.html -->

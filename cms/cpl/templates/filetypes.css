@@ -1,0 +1,17 @@
+.fileicon .file { background-image: url('../images/icons/16/page_white.png'); }
+    
+.fileicon .html, .fileicon .htm { background-image: url('../images/icons/16/page_white_world.png'); } 
+.fileicon .css, .fileicon .xml { background-image: url('../images/icons/16/page_white_code.png'); }
+.fileicon .js { background-image: url('../images/icons/16/page_white_code_red.png'); }
+.fileicon .zip, .fileicon .rar, .fileicon .tar, .fileicon .gz { background-image: url('../images/icons/16/page_white_compressed.png'); }
+.fileicon .sql, .fileicon .db { background-image: url('../images/icons/16/page_white_database.png'); }
+.fileicon .xls { background-image: url('../images/icons/16/page_white_excel.png'); }
+.fileicon .swf, .fileicon .fla { background-image: url('../images/icons/16/page_white_flash.png'); }
+.fileicon .htaccess { background-image: url('../images/icons/16/page_white_gear.png'); }
+.fileicon .htpasswd { background-image: url('../images/icons/16/page_white_key.png'); }
+.fileicon .php { background-image: url('../images/icons/16/page_white_php.png'); }
+.fileicon .jpg, .fileicon .jpeg, .fileicon .bmp, .fileicon .gif, .fileicon .png, .fileicon .psd, .fileicon .ico { background-image: url('../images/icons/16/page_white_picture.png'); }
+.fileicon .ppt { background-image: url('../images/icons/16/page_white_powerpoint.png'); }
+.fileicon .txt, .fileicon .rtf { background-image: url('../images/icons/16/page_white_text.png'); }
+.fileicon .doc, .fileicon .docx { background-image: url('../images/icons/16/page_white_word.png'); }
+.fileicon .pdf { background-image: url('../images/icons/16/page_white_acrobat.png'); }

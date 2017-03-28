@@ -1,0 +1,18 @@
+<table class="t1 mat">
+<!-- BEGIN materials_block -->
+<tr>
+    <th colspan="4">{MATERIALS_BLOCK_NAME}</th>
+    <th colspan="2"><a href="#{MATERIALS_BLOCK_NAME}" class="browse1"><img src="images/icons/16/add.png" width="16" height="16" border="0" align="absmiddle"></a></th>
+</tr>
+<!-- BEGIN material -->
+<tr material_id="{MATERIAL_ID}" block="{MATERIAL_BLOCK}">        
+    <td>{MATERIAL_NUM}</td>
+    <td class="{MATERIAL_CLASS}">{MATERIAL_NAME}</td>
+    <td><a href="material.php?id={MATERIAL_ID}"><img src="images/icons/16/pencil.png" width="16" height="16" border="0" align="absmiddle"></a></td>
+    <td><a href="ajax/struct_material_del.php?page_id={MATERIAL_PAGE_ID}&block={MATERIAL_BLOCK}&material_id={MATERIAL_ID}&num={MATERIAL_NUM}" class="remove_material"><img src="images/icons/16/delete.png" width="16" height="16" border="0" align="absmiddle"></a></td>
+    <td><a class="material_order up" title="Выше" href="ajax/page_materials_order.php?page_id={MATERIAL_PAGE_ID}&block={MATERIAL_BLOCK}"><img src="images/icons/16/bullet_arrow_up.png" width="16" height="16" border="0" align="absmiddle"></a></td>
+    <td><a class="material_order down" title="Ниже" href="ajax/page_materials_order.php?page_id={MATERIAL_PAGE_ID}&block={MATERIAL_BLOCK}"><img src="images/icons/16/bullet_arrow_down.png" width="16" height="16" border="0" align="absmiddle"></a></td>
+</tr>
+<!-- END material -->
+<!-- END materials_block -->
+</table>

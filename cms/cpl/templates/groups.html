@@ -1,0 +1,127 @@
+<!-- INCLUDE header.inc.html -->
+
+<style type="text/css">        
+    a.update img { background: url('images/icons/16/pencil.png') center center no-repeat; }
+    a.delete img { background: url('images/icons/16/delete.png') center center no-repeat; }
+    a.loading img { background-image: url('images/icons/16/ajax-loader.gif')}
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#settings_table tr").mouseover(function(){ $(this).css("background-color", "#F0FAE8"); });
+        $("#settings_table tr").mouseout(function(){ $(this).css("background-color", ""); });
+        
+        $("a.update").click(function(){
+            var a = $(this);
+            var tr = a.parents("tr");
+            var old_name = tr.find("td:first").text();
+            var new_name = prompt("Введите новое название группы", old_name);            
+            if(typeof new_name == 'string' && new_name != '') {
+                a.addClass("loading");
+                $.post(a.attr("href"), {new_name: new_name}, function(xml){ 
+                    var code = $("code", xml).text();
+                    var data = $("data", xml).text();
+                    if(code == 0) {
+                        tr.find("td:first").html("<b>"+data+"</b>");
+                    }
+                    else {
+                        alert("Ошибка: " + code + "\n" + data);
+                    }
+                    a.removeClass("loading"); 
+                }, "xml");
+            }
+            return false;
+        });
+        
+        $("a.delete").click(function(){
+            var a = $(this);
+            var tr = a.parents("tr");
+            if(confirm("Удалить группу '" + tr.find("td:first").text() + "'?")) {
+                a.addClass("loading");
+                $.post(a.attr("href"), {}, function(xml){ 
+                    var code = $("code", xml).text();
+                    var data = $("data", xml).text();
+                    if(code == 0) {
+                        tr.remove();
+                    }
+                    else {
+                        alert("Ошибка: " + code + "\n" + data);
+                    }
+                    a.removeClass("loading"); 
+                }, "xml");
+            }
+            return false;
+        });
+        
+        $("#add_form").submit(function(){
+        $("#new_group_name").val('');
+            var new_name = prompt("Введите название новой группы", "Новая группа");            
+            if(typeof new_name == 'string' && new_name != '') {
+                $("#new_group_name").val(new_name);
+                return true;
+            }
+            else return false;
+        });
+    });
+</script>
+
+<div id="settings_table">
+
+<!-- BEGIN error -->
+<div class="error">
+    <strong>{ERROR_TITLE}</strong><br>
+    {ERROR_TEXT}
+</div>
+<!-- END error -->
+
+<!-- BEGIN warning -->
+<div class="warning">
+    <strong>{WARNING_TITLE}</strong><br>
+    {WARNING_TEXT}
+</div>
+<!-- END warning -->
+<!-- BEGIN notice -->
+<div class="notice">
+    <strong>{NOTICE_TITLE}</strong><br>
+    {NOTICE_TEXT}
+</div>
+<!-- END notice -->
+
+
+<table class="t3">
+<thead>
+    <tr>
+    	<th>Группа</th>
+    	<th>Пользователей</th>
+        <th>Страниц</th>
+        <th>Материалов</th>
+        <th>Плагинов</th>
+        <th>Настроек</th>
+        <th colspan="2">&nbsp;</th>
+    </tr>
+</thead>
+<!-- BEGIN row -->
+<tr>
+	<td><strong>{GROUP_NAME}</strong></td>
+	<td class="center">{CNT_USERS}</td>
+    <td class="center">{CNT_PAGES}</td>
+    <td class="center">{CNT_MAT}</td>
+    <td class="center">{CNT_PLUGINS}</td>
+    <td class="center">{CNT_SETTIGS}</td>
+    <td><a class="update" href="ajax/group_update.php?group_id={GROUP_ID}" title="Редактировать группу"><img src="images/spacer.gif" border="0" width="16" height="16"></a></td>
+    <td><a class="delete" href="ajax/group_del.php?group_id={GROUP_ID}" title="Удалить группу (отправить в корзину)"><img src="images/spacer.gif" border="0" width="16" height="16"></a></td>
+</tr>
+<!-- END row -->
+</table>
+
+<form method="post" action="group_add.php" id="add_form">
+<input type="hidden" name="group_name" value="" id="new_group_name">
+<div style="padding: 10px; margin: 10px; text-align: center;">
+    <input type="submit" value="Добавить новую группу" class="bigbutton">
+</div>
+
+</form>
+
+</div>
+
+<!-- INCLUDE footer.inc.html -->

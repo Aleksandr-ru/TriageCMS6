@@ -1,0 +1,334 @@
+<!-- INCLUDE header.inc.html -->
+
+<link rel="stylesheet" type="text/css" href="templates/tabs.css">
+<script type="text/javascript" src="js/tabs.js"></script>
+
+<script type="text/javascript" src="../scripts/jquery.tabby.js"></script>
+<script type="text/javascript" src="../editor/codemirror/js/codemirror.js"></script>
+
+<style type="text/css">
+    .panel { margin: 5px; padding: 5px; background-color: #eee; border: solid 1px #ccc; }
+    
+    .tab ul { margin: 0; padding: 0; list-style-type: none; }
+    .tab li { margin: 10px; padding: 0; list-style-type: none; }
+    .tab li label { float: left; width: 16em; margin-right: 1em; }
+    .tab li input[type=text], .tab li input[type=file], .tab li select, .tab li textarea { width: 25em; }
+    .tab li textarea { height: 4em; }
+    .tab textarea { width: 100%; height: 40em; }
+    
+    #templates_list ul, #linked_pages ul, #files_list ul { margin: 0; margin-bottom: 15px; padding: 2px; }	
+    
+    #templates_list li, #linked_pages li, #files li li, #files_list li { list-style-type: none; padding: 6px 0 0 24px; background-position: 4px 4px; background-repeat: no-repeat; }
+    #templates_list li { background-image: url('images/icons/16/page_gear.png'); }
+    #linked_pages li { background-image: url('images/icons/16/page.png'); }
+    #linked_pages li.disabled { background-image: url('images/icons/16/page_gray.png'); }
+    #templates_list li.status301 { background-image: url('images/icons/16/page_go.png'); }	
+    #templates_list li.status403 { background-image: url('images/icons/16/page_key.png'); }	
+    #templates_list li.status404 { background-image: url('images/icons/16/page_delete.png'); }
+    #files_list li { background-image: url('images/icons/16/page_code.png'); }	
+        
+    #templates_list a, #linked_pages a, #files li li a, #files_list a { color: #000; text-decoration: none; }
+    #templates_list li.selected > a { font-weight: bold; border: dotted 1px black; }
+    #linked_pages li { float: left; margin: 2px 0;  }
+    #linked_pages li.disabled a { color: gray; }
+    #templates_list b, #linked_pages b, #files b, #files_list b { color: gray; }
+    
+    #files_list { display: none; }
+    #files_list a:hover { border-bottom: dashed 1px #000; }
+    
+    .plugin_templates li { margin-left: 17em; padding-left: 24px; background: url('images/icons/16/plugin.png') left center no-repeat; font-weight: bold; }
+    
+    #files li { float: left; }
+    #files li li { float: none; }
+    #files li li a { border-bottom: dashed 1px #000; }
+    #files li.html { background-image: url('images/icons/16/page_white_world.png'); }
+    #files li.css  { background-image: url('images/icons/16/page_white_code.png'); }    	
+    
+    div.codeBorder { background-color: #fff; border: 1px inset; }
+    
+    .t1 td { background-color: #eee; }
+    .mat .text { background: #eee url('images/icons/16/page_white_text.png') 4px 4px no-repeat; padding-left: 24px; }
+    .mat .html { background: #eee url('images/icons/16/page_white_world.png') 4px 4px no-repeat; padding-left: 24px; }
+    .mat .css { background: #eee url('images/icons/16/page_white_code.png') 4px 4px no-repeat; padding-left: 24px; }
+    .mat .javascript { background: #eee url('images/icons/16/page_white_code_red.png') 4px 4px no-repeat; padding-left: 24px; }
+    .mat .plugin { background: #eee url('images/icons/16/page_white_gear.png') 4px 4px no-repeat; padding-left: 24px; }
+    .mat .inactive { color: gray; }
+    
+    #templates_list li sup {
+        vertical-align: top;
+        margin-left: 5px;        
+        padding: 0 3px;
+        padding-bottom: 1px;
+        background: #bbb;
+        color: white;
+        border-radius: 3px;
+        font-size: 10px;
+        cursor: default;
+    }	
+</style>
+
+<script type="text/javascript">
+    /*
+    var use_codemirror = {USE_CODEMIRROR};
+    var editor;
+    */
+    
+    $(document).ready(function(){
+        
+        reload_variables();
+        
+        $("a.remove_variable").live("click", function(){
+            if(!confirm('Убрать значение (это отразится везде, где используется переменная)?')) return false;
+            var tr = $(this).parents("tr");
+            $("body").css("cursor", "wait");
+            $.post( $(this).attr("href"), {}, function(data){
+                if(data != "OK") {
+                    alert(data);
+                    $("body").css("cursor", "auto");                    
+                } else {
+                    reload_variables();
+                }                
+            });
+            return false;
+        });
+        
+        /*
+        if(use_codemirror) {
+            
+            editor = CodeMirror.fromTextArea( $("#template_file_data").wrap('<div class="codeBorder"></div>').get(0) , {                
+                parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
+                stylesheet: ["../editor/codemirror/css/xmlcolors.css", "../editor/codemirror/css/jscolors.css", "../editor/codemirror/css/csscolors.css"],
+                path: "../editor/codemirror/js/"   
+            });            
+        }
+        else {
+            $("#template_file_data").tabby();
+        } 
+        */
+        
+        $("ul.tabs li a").click(function(){
+            var index = $("ul.tabs li").index($(this).parents("li"));
+    		
+            switch(index)
+            {
+                //case 1:
+                case 2:
+                    $("#delchk").removeAttr("checked").change();
+                    $("#bigbtn").attr("disabled", "disabled");
+                    break;
+                default:
+                    $("#delchk").removeAttr("checked").change();
+                    $("#bigbtn").removeAttr("disabled"); 
+            }
+    	}); 
+        
+        $("#delchk").change(function(){
+            var f = $(this).parents("form");
+            if($(this).is(":checked")) {                
+                f.find("input[type=submit]").val("Удалить шаблон");
+            } else {                
+                f.find("input[type=submit]:last").val("Сохранить шаблон");
+            }
+        });     
+        
+        $("#template_file").change(function(){
+            $(this).parents("form").attr("action", "");
+            $(this).parents("form").submit();
+        });  
+        
+        $("#templte_files").click(function(){
+            if($("#files_list ul li").length < 1) {
+                alert('Нет доступных файлов!');
+                return false;
+            }
+            $("#files_list").slideToggle();    
+        });
+    });
+    
+    var current_variable;
+    
+    function browse_materials_var(var_name)
+    {
+        current_variable = var_name;
+        var title = 'Выбор материала';
+        var btntitle = 'Создать новый';
+        var dlg = window.open('dialog.php?script=materials&buttons[DLG_NEW]='+btntitle+'&callback=dlg_materials_var&title='+title, 'mat', 'width=500, height=500'); 
+        dlg.focus();
+        return false;
+    }
+    
+    function dlg_materials_var(btn, mat)
+    {
+        if(!current_variable) return false;
+        
+        switch(btn)
+        {
+            case 'DLG_NEW':
+                window.location.href = 'material.php?template_id={TMPL_ID}&variable='+current_variable;
+                break;
+            case 'DLG_OK':
+            {
+                if(mat.id && mat.id > 0)
+                {                    
+                    $("body").css("cursor", "wait");
+                    $.post("ajax/template_variable_set.php", {template_id: "{TMPL_ID}", variable: current_variable, material_id: mat.id}, function(data){
+                        
+                        if(data != "OK") {
+                            alert(data);    
+                            $("body").css("cursor", "auto");                                                        
+                        } else {
+                            reload_variables();    
+                        }                      
+                    });
+                }                
+            }
+            case 'DLG_CANCEL':
+            default:
+            
+        }
+        return true;
+    }
+    
+    function reload_variables()
+    {      
+        $("body").css("cursor", "wait");
+        $("#tmpl_variables").load("ajax/template_variables.php?template_id={TMPL_ID}", {}, function(){ $("body").css("cursor", "auto"); });
+    }
+</script>
+
+<div style="float: left; width: 75%">
+    <!-- BEGIN error -->
+    <div class="error">
+        <strong>{ERROR_TITLE}</strong><br>
+        {ERROR_TEXT}
+    </div>
+    <!-- END error -->
+    
+    <!-- BEGIN warning -->
+    <div class="warning">
+        <strong>{WARNING_TITLE}</strong><br>
+        {WARNING_TEXT}
+    </div>
+    <!-- END warning -->
+    <!-- BEGIN notice -->
+    <div class="notice">
+        <strong>{NOTICE_TITLE}</strong><br>
+        {NOTICE_TEXT}
+    </div>
+    <!-- END notice -->
+    
+    <form method="post" action="template_save.php" enctype="multipart/form-data">
+    <input type="hidden" name="template_type" value="{TMPL_TYPE}">
+    <input type="hidden" name="template_id" value="{TMPL_ID}">
+    
+    <div class="panel" style="background: transparent; border: 0;">
+        <ul class="tabs">
+            <li><a name="params" href="#params">Параметры шаблона</a></li>
+            <li><a name="variables" href="#variables">Переменные</a></li>
+            <li><a name="files" href="#files">Файлы</a></li>
+        </ul>
+        <div class="tab">
+            <ul>
+                <li><label>ID шаблона:</label> <img src="images/icons/16/page_gear.png" border="0" width="16" height="16" align="absmiddle"> <strong>{ID_TEXT}</strong></li>
+                <li><label>Название:</label> <input type="text" name="name" value="{TMPL_NAME}" {SPECIAL_DIS}></li>
+                <li><label>Файл:</label> <input type="text" name="filename" value="{TMPL_FILENAME}" readonly="readonly"></li>
+                <li><label>Загрузить файл:</label> <input type="file" name="userfile"></li>
+                <li><label>Удалить шаблон:</label> <input type="checkbox" name="del" value="1" id="delchk" {SPECIAL_DIS} /> полностью удалить все содержимое шаблона без возможности восстановления</li>
+                <li><label>Содержит шаблоны модулей:</label>
+                    <ul class="plugin_templates">
+                        <!-- BEGIN moduletmpl -->
+                        <li>{MT_NAME} ({MT_UID})</li>
+                        <!-- END moduletmpl -->
+                    </ul>
+                </li>
+            </ul>
+            <div class="clear"></div>
+        </div>
+        <div class="tab">
+            <div id="tmpl_variables"></div>
+            <br>
+            * изменения сделанные здесь применяются немедленно
+        </div>
+        <div class="tab" id="files">
+            <ul>
+            <li><b>Общие</b>
+                <ul>
+                <li class="css"><a href="fileditor.php?file=cms/templates/default.css">default.css</a></li>
+                </ul>
+            </li>
+            <li><b>Шаблон</b>
+                <ul>
+                <!-- BEGIN template_file -->
+                <li class="html"><a href="fileditor.php?file=cms/templates/{TF_FILENAME}">{TF_FILENAME}</a></li>
+                <!-- END template_file -->
+                <!-- BEGIN template_css -->
+                <li class="css"><a href="fileditor.php?file=cms/templates/{TC_FOLDER}/{TC_FILENAME}">{TC_FILENAME}</a></li>
+                <!-- END template_css -->
+                </ul>
+            </li>
+            <!-- BEGIN module_files -->
+            <li><b>Модуль &quot;{MF_MODULE}&quot;</b>
+                <ul>
+                <!-- BEGIN module_file -->
+                <li class="{MF_CLASS}"><a href="fileditor.php?file=cms/templates/{MF_TEMPLATE}/plugins/{MF_FOLDER}/{MF_FILENAME}">{MF_FILENAME}</a></li>
+                <!-- END module_file -->               
+                </ul>
+            </li>
+            <!-- END module_files -->
+            </ul>
+            <div class="clear"></div>                     
+        </div>
+    </div>
+    
+    <div style="padding: 10px; margin: 10px; text-align: center;">    
+        <input type="submit" value="Сохранить шаблон" class="bigbutton" id="bigbtn">
+    </div>
+    </form>
+    
+    <div class="panel" id="linked_pages">
+        <b>Связанные страницы</b>
+        
+        <ul>
+            <!-- BEGIN page_row -->
+            <li class="{PAGE_CLASS}"><a href="struct.php?page_id={PAGE_ID}">{PAGE_NAME}</a></li>
+            <!-- END page_row -->
+        </ul>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div style="float: left; width: 25%">
+    <div class="panel" id="templates_list">
+        <b>Шаблоны страниц</b>
+        <ul>
+            <!-- BEGIN tmpl_row -->
+            <li class="{T_CLASS}"><a href="templates.php?template_id={T_ID}">{T_NAME}</a><sup>{T_PAGES_COUNT}</sup></li>
+            <!-- END tmpl_row -->
+        </ul>
+        
+        <b>Специальные шаблоны</b>
+        <ul>
+            <li class="status301 {SPECIAL_SEL301}"><a href="templates.php?template_id=special:301">301 перенаправление</a></li>
+            <li class="status403 {SPECIAL_SEL403}"><a href="templates.php?template_id=special:403">403 доступ запрещен</a></li>
+            <li class="status404 {SPECIAL_SEL404}"><a href="templates.php?template_id=special:404">404 страница не найдена</a></li>
+        </ul>
+    </div>
+    
+    <div style="margin: 10px;" id="addpage" class="textlinks">
+    <img src="images/icons/16/page_add.png" width="16" height="16" border="0" align="absmiddle">
+    <a href="template_add.php" title="Создать новый пустой шаблон для загрузки файла">Добавить новый шаблон</a> [ <a href="#file" id="templte_files" title="Выбрать файл в /cms/templates/ и на основе него создать шаблон">из файла</a> ]
+    </div>
+    
+    <div class="panel" id="files_list">
+        <b>Доступные файлы</b>
+        <ul>
+            <!-- BEGIN file_row -->
+            <li><a href="template_add.php?file={FILENAME}">{FILENAME}</a></li>
+            <!-- END file_row -->            
+        </ul>
+    </div>
+    
+</div>
+<div class="clear"></div>
+
+<!-- INCLUDE footer.inc.html -->

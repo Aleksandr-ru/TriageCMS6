@@ -1,0 +1,78 @@
+<!-- INCLUDE header.inc.html -->
+
+<style type="text/css">
+    
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".confirm").click(function(){
+            if(!confirm($(this).attr("title") + "?")) return false;
+        });    
+            
+        $("#trash_table tbody tr").mouseover(function(){ $(this).css("background-color", "#F0FAE8"); });
+        $("#trash_table tbody tr").mouseout(function(){ $(this).css("background-color", ""); });
+    });
+</script>
+
+<!-- BEGIN error -->
+<div class="error">
+    <strong>{ERROR_TITLE}</strong><br>
+    {ERROR_TEXT}
+</div>
+<!-- END error -->
+
+<!-- BEGIN warning -->
+<div class="warning">
+    <strong>{WARNING_TITLE}</strong><br>
+    {WARNING_TEXT}
+</div>
+<!-- END warning -->
+<!-- BEGIN notice -->
+<div class="notice">
+    <strong>{NOTICE_TITLE}</strong><br>
+    {NOTICE_TEXT}
+</div>
+<!-- END notice -->
+
+<div id="trash_table">
+
+<table class="t3">
+<thead>
+    <tr>
+    	<th>Тип</th>
+        <th>Название</th>
+        <th>Дата удаления</th>
+    	<th>Пользователь</th>
+        <th>&nbsp;</th>
+    </tr>
+</thead>
+<tbody>
+    <!-- BEGIN row -->
+    <tr>
+        <td>{TYPE}</td>
+        <td>{NAME}</td>
+    	<td>{DATE}</td>
+    	<td>{USER}</td>
+        <td>
+            <a class="confirm" title="Восстановить объект" href="trash_restore.php?trash_id={TRASH_ID}"><img src="images/icons/16/drive-upload.png" /></a>
+        </td>
+    </tr>
+    <!-- END row -->
+</tbody>
+<tfoot>
+    <tr>
+        <td colspan="5"><strong>Отображено записей: {SHOW_CNT}<!-- из {ALL_CNT} -->.</strong></td>
+    </tr>
+</tfoot>
+</table>
+
+<form method="post" action="trash_clean.php">
+    <p class="center">
+        <input type="submit" name="clean_trash" value="Очистить корзину" title="Очистить корзину" class="bigbutton confirm" />
+    </p>
+</form>
+
+</div>
+
+<!-- INCLUDE footer.inc.html -->

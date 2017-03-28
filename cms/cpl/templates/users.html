@@ -1,0 +1,106 @@
+<!-- INCLUDE header.inc.html -->
+
+<link rel="stylesheet" type="text/css" href="templates/tabs.css">
+
+<style type="text/css">
+    .t1 tr, .t1 td { background-color: #eee; }
+    #tab1 { display: block; }
+    #tab1 tr.active td.login { background: #eee url('images/icons/16/user.png') 4px 4px no-repeat; padding-left: 24px; }
+    #tab1 tr.inactive td { color: gray; }
+    #tab1 tr.inactive td.login { background: #eee url('images/icons/16/user_gray.png') 4px 4px no-repeat; padding-left: 24px; }
+    #tab1 tr.super td.login { font-weight: bold; }
+    #tab1 tr.active td.act { background: #eee url('images/icons/16/lightbulb.png') center center no-repeat; }
+    #tab1 tr.inactive td.act { background: #eee url('images/icons/16/lightbulb_off.png') center center no-repeat; }
+    #tab1 td.load { background: #eee url('images/icons/16/ajax-loader.gif') center center no-repeat !important; }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#tab1 td.act a").click(function(){
+           var user_id = $(this).attr("href").split("#");
+           user_id = user_id[1];
+           var tr = $(this).parents("tr");
+           var active = tr.hasClass("active");
+           var td = $(this).parent("td");
+           td.addClass("load");
+           $.post("ajax/user_activate.php", {'user_id': user_id, 'current_act': active ? 1 : 0}, function(data){ 
+                td.removeClass("load");
+                if(data)
+                {
+                    alert(data);
+                    return false;
+                }
+                tr.removeClass("active").removeClass("inactive");
+                tr.addClass(active ? "inactive" : "active");  
+           });
+           
+           return false; 
+        });
+        
+        $("#tab1 a.del").click(function(){
+            if(!confirm('Удалить пользователя?')) return false;
+        });
+    });
+</script>
+
+
+<div style="margin: 5px; padding: 5px;">
+
+<!-- BEGIN error -->
+<div class="error">
+    <strong>{ERROR_TITLE}</strong><br>
+    {ERROR_TEXT}
+</div>
+<!-- END error -->
+
+<!-- BEGIN warning -->
+<div class="warning">
+    <strong>{WARNING_TITLE}</strong><br>
+    {WARNING_TEXT}
+</div>
+<!-- END warning -->
+<!-- BEGIN notice -->
+<div class="notice">
+    <strong>{NOTICE_TITLE}</strong><br>
+    {NOTICE_TEXT}
+</div>
+<!-- END notice -->
+
+<ul class="tabs">
+	<!-- BEGIN let -->
+    <li class="{SELECTED}"><a href="users.php?l={LETTER_URL}">{LETTER}</a></li>
+    <!-- END let -->
+</ul>
+
+<div class="tab" id="tab1">
+    <table class="t1">
+    <tr>
+        <th>ID</th>
+        <th>Логин</th>
+        <th>E-mail</th>
+        <th colspan="3">Действия</th>
+    </tr>
+    <!-- BEGIN row -->
+    <tr class="{USER_CLASS}">        
+        <td align="center">{USER_ID}</td>
+        <td class="login">{USER_LOGIN}</td>
+        <td>{USER_EMAIL}</td>        
+        <td class="act"><a href="#{USER_ID}" title="Активировать/деактивировать пользователя"><img src="images/spacer.gif" width="16" height="16" border="0"></a></td>
+        <td><a href="user_edit.php?user_id={USER_ID}" title="Редактировать пользователя"><img src="images/icons/16/pencil.png" width="16" height="16" border="0"></a></td>
+        <td><a class="del" href="user_del.php?user_id={USER_ID}" title="Удалить пользователя (отправить в корзину)"><img src="images/icons/16/delete.png" width="16" height=""  border="0"></a></td>
+    </tr>
+    <!-- END row -->
+    </table>
+</div>
+
+* <strong>жирным</strong> выделены супер-пользователи
+
+<div style="padding: 10px; margin: 10px; text-align: center;">
+    <form method="post" action="user_edit.php">
+    <input type="submit" value="Добавить нового пользователя" class="bigbutton" id="bigbtn">
+    </form>
+</div>
+
+</div>
+
+<!-- INCLUDE footer.inc.html --> 

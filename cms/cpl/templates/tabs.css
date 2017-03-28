@@ -1,0 +1,52 @@
+/* bagin tabs */
+ul.tabs, ul.tabs li, ul.tabs li a { margin: 0; padding: 0; }
+ul.tabs {
+	height: 25px;
+	line-height: 25px;
+	margin: 0 0 3px;
+	list-style: none;
+}
+* html ul.tabs {margin-bottom: 0;}
+ul.tabs li {
+	float: left;
+	margin-right: 1px;
+	font-family: Tahoma;
+	font-size: 14px;
+	font-weight: bold;
+}
+ul.tabs li a {
+	display: block;
+	padding: 0 13px 1px;
+	margin-bottom: -1px;
+	color: #444;
+	text-decoration: none;
+	cursor: pointer;
+	background-color: #ddd;
+	border: 1px solid #ccc;
+	border-bottom: 1px solid #ddd;
+	position: relative;
+}
+* html ul.tabs li a {float: left}
+*+html ul.tabs li a {float: left}
+ul.tabs li a:hover {
+	color: #000;
+	padding: 0 13px;
+	background-color: #eee;
+	border: 1px solid #ccc; 
+	/*border-bottom: solid 1px #ddd;*/
+	
+}
+ul.tabs li.selected a, ul.tabs li.selected a:hover {
+	color: #444;
+	background-color: #EFEFEF;
+	padding: 0px 13px 2px;
+	border: 1px solid #ccc;
+	border-bottom: 1px solid #EFEFEF;
+}
+div.tab {
+	display: none;
+	border: 1px solid #ccc;
+	background: #EFEFEF;
+	padding: 6px 12px;
+}
+/* end tabs */

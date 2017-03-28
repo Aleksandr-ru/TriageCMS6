@@ -1,0 +1,32 @@
+Options +FollowSymlinks
+php_flag magic_quotes_gpc off
+
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule .* - [QSA,L]
+
+# ------------------------------------------------------------------------------------------------------------!
+# Основные правила преобразования УРЛов вида
+#
+# /pagekey1/pagekey2/ -> index.php?rewrite_path=pagekey1/pagekey2
+# /pagekey1/pagekey2.html -> index.php?rewrite_path=pagekey1/pagekey2
+# /pagekey1/pagekey2/page-1.html -> index.php?rewrite_path=pagekey1/pagekey2&page_num=1
+# /pagekey1/pagekey2/-event_name.html  -> index.php?rewrite_path=pagekey1/pagekey2&event=event_name
+# /pagekey1/pagekey2/-event_name/var/val.html  -> index.php?rewrite_path=pagekey1/pagekey2&event=event_name&rewrite_variables=var/val
+#
+# а также доступ в панель управления сайтом, к пользовтельским файлам и AJAX выполнение плагинов
+#
+# ЭТО ДОЛЖЕН БЫТЬ ПОСЛЕДНИЙ БЛОК ПРАВИЛ!! ВСЕ ПЛАГИНЫ И ПРОЧЕЕ ВЫШЕ!!!
+
+RewriteRule ^cms/.* - [QSA,L]
+RewriteRule ^files/([0-9]+)/([^/]+)$ files/cms/$1-$2 [PT,L]
+RewriteRule ^files/.* - [L]
+RewriteRule ^ajax/([^/.]+)/([^/.]+)(/|\.html|\.php)?$ cms/ajax.php?plugin=$1&event=$2 [QSA,L]
+
+#RewriteRule (.*/|^)index.html $1 [QSA,PT]
+RewriteRule ^(.*)\.html $1/ [QSA,PT]
+RewriteRule (.*/|^)page-([0-9]+)/?$ $1?page_num=$2 [QSA,PT]
+RewriteRule (.*/|^)-([^/]+)(/(.*))? $1?event=$2&rewrite_variables=$3 [QSA,PT]
+RewriteRule (.*) index.php?rewrite_path=$1 [QSA,L]

@@ -1,0 +1,16 @@
+.cms_viseditor_material { border: dashed 1px red; }
+.cms_viseditor_material .cms_viseditor_material_toolbar { padding: 2px; background-color: #F0F0EE; border-bottom: solid 1px #ccc; }
+.cms_viseditor_material .cms_viseditor_material_toolbar input[type=button] { width: 24px; height: 24px; border: solid 1px #F0F0EE; background-color: #F0F0EE; background-position: center center; background-repeat: no-repeat; }
+.cms_viseditor_material .cms_viseditor_material_toolbar input[type=button]:hover { background-color: #C2CBE0; border-color: #0A246A; }
+.cms_viseditor_material .cms_viseditor_material_toolbar .cms_viseditor_btnedit { background-image: url('../images/icons/16/pencil.png'); }
+.cms_viseditor_material .cms_viseditor_material_toolbar .cms_viseditor_btndel { background-image: url('../images/icons/16/delete.png'); }
+/*.cms_viseditor_material .cms_viseditor_material_toolbar .cms_viseditor_btnup { background-image: url('../images/icons/16/bullet_arrow_up.png'); }
+.cms_viseditor_material .cms_viseditor_material_toolbar .cms_viseditor_btndown { background-image: url('../images/icons/16/bullet_arrow_down.png'); }*/
+.cms_viseditor_material .cms_viseditor_material_toolbar .cms_viseditor_btnsave { background-image: url('../images/icons/16/disk.png'); display: none; }
+.cms_viseditor_material .cms_viseditor_material_data {}
+.cms_viseditor_material .cms_viseditor_material_text {}
+.cms_viseditor_material .cms_viseditor_material_html {}
+.cms_viseditor_material .cms_viseditor_material_css { padding: 2px 0 0 24px; background: url('../images/icons/16/page_white_code.png') 4px 4px no-repeat; height: 24px; }
+.cms_viseditor_material .cms_viseditor_material_javascript { padding: 2px 0 0 24px; background: url('../images/icons/16/page_white_code_red.png') 4px 4px no-repeat; height: 24px; }
+.cms_viseditor_material .cms_viseditor_material_plugin { padding: 2px 0 0 24px; background: url('../images/icons/16/page_white_gear.png') 4px 4px no-repeat; height: 24px; }
+.cms_viseditor_material .cms_viseditor_material_editor { display: none; }
