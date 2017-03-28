@@ -1,0 +1,98 @@
+<style type="text/css">
+    .plugin_head { padding: 20px; }
+    .plugin_head ul { margin: 0; padding: 0; list-style-type: none; }
+    .plugin_head ul li { float: left; margin: 0; padding: 0; width: 33%; text-align: center; }
+    .plugin_head input, .plugin_head select { font-size: 24px; }
+    
+    td.controls, td.icons { white-space: nowrap; text-align: center; }
+    td.controls a, td.icons span { margin: 2px; padding: 2px; background-repeat: no-repeat; border: 0; }
+        
+    .controls a.edit { background-image: url('images/icons/16/pencil.png'); }
+    .controls a.delete { background-image: url('images/icons/16/delete.png'); }
+    .controls a.onoff { background-image: url('images/icons/16/lightbulb.png'); }
+    
+    .off td { background-color: #eee; }
+    .off .controls a.onoff { background-image: url('images/icons/16/lightbulb_off.png'); }
+    .rss .rss { background-image: url('../plugins/news/images/rss.png'); }
+    .pic .pic { background-image: url('images/icons/16/image.png'); }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".t1 tr").mouseover(function(){ $(this).css("background-color", "#F0FAE8"); });
+        $(".t1 tr").mouseout(function(){ $(this).css("background-color", ""); });
+        
+        $(".t1 a.delete").click(function(){
+            //$(this).parents("tr").remove();
+            return false;
+        });
+        
+        $(".t1 a.onoff").click(function(){
+            var tr = $(this).parents("tr");
+            $.post($(this).attr("href"), {off: tr.hasClass("off") ? 0 : 1}, function(data){                
+                if(data != 'OK') alert(data);
+                else tr.toggleClass("off");
+            });            
+            return false;
+        });
+    });
+    
+    function changeYear(val)
+	{
+		if(val) window.location.href='plugin.php?plugin_uid=news&year='+val;
+	}
+</script>
+
+<div class="plugin_head">
+    <ul>
+        <li><input type="button" value="Добавить новость" onclick="window.location.href='material.php?plugin_uid=news&group_id={MATERIAL_GROUP_ID}';"></li>
+        <li>
+            
+            <select id="year" OnChange="changeYear(this.value);">
+                <!-- BEGIN years -->
+                <option value="{YEAR_VAL}" {YEAR_SEL}>{YEAR_VAL} ({YEAR_CNT})</option>
+                <!-- END years -->
+            </select>
+            <input type="button" value="Показать" OnClick="changeYear($(this).prev().val());">
+        </li>
+        <li><input type="button" value="Группы новостей" onclick="window.location.href='plugin.php?plugin_uid=news&event=groups';"></li>
+    </ul>
+    <div class="clear"></div>
+</div>
+
+<div>
+    <table class="t1">
+    <tr>
+        <th>ID</th>
+        <th>Дата время</th>
+        <th>Заголовок</th>
+        <th>
+            <img src="images/icons/16/image.png" width="16" height="16" title="У новости есть изображение">
+        </th>
+        <th>
+            <img src="../plugins/news/images/rss.png" width="16" height="16" title="У новости есть короткий текст и она может присутствовать в RSS ленте">
+        </th>   
+        <th>Группы</th>                      
+        <th>Действия</th>
+    </tr>
+    <!-- BEGIN row -->
+    <tr class="{NEWS_CLASS} {IS_RSS} {IS_PIC} {ONOFF}">
+        <td class="center">{NEWS_ID}</td>
+        <td class="center nowrap">{NEWS_DATE}</td>
+        <td>{NEWS_TITLE}</td>
+        <td class="icons">
+            <span class="pic"><img src="images/spacer.gif" width="16" height="16"></span>
+        </td>
+        <td class="icons">
+            <span class="rss"><img src="images/spacer.gif" width="16" height="16"></span>
+        </td>     
+        <td><small>{NEWS_GROUPS}</small></td>   
+        <td class="controls">
+            <a class="onoff" title="Включить/выключить" href="ajax/plugin.php?plugin_uid=news&event=onoff&material_id={NEWS_MATERIAL_ID}"><img src="images/spacer.gif" width="16" height="16"></a>
+            <a class="edit" title="Редактировать" href="material.php?material_id={NEWS_MATERIAL_ID}&plugin_uid=news"><img src="images/spacer.gif" width="16" height="16"></a>        
+            <a class="delete" title="Удалить" href="ajax/plugin.php?plugin_uid=news&event=delnews&news_id={NEWS_ID}"><img src="images/spacer.gif" width="16" height="16"></a>
+        </td>
+    </tr>
+    <!-- END row -->
+    </table>
+</div>

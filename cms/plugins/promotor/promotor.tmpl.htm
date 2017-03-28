@@ -1,0 +1,112 @@
+<style type="text/css">
+    #promotor {
+        position: relative;
+        width: 959px;
+        height: 359px;
+        overflow: hidden;
+        margin: 1em auto; 
+    }
+    #promotor a {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;     
+    }
+    #promotor .promotor_controls {
+        display: block;
+        position: absolute;
+        left: 10px;
+        bottom: 10px;
+    }
+    #promotor .promotor_controls, #promotor .promotor_controls li {
+        margin: 0; 
+        padding: 0;
+        list-style-type: none;
+    }
+    #promotor .promotor_controls li {
+        display: inline-block;
+        cursor: pointer;
+        background-color: #fff;
+        border: solid 1px #FF9E17;
+        width: 10px; 
+        height: 10px;
+        border-radius: 10px;
+        margin: 0 2px;
+    }
+    #promotor .promotor_controls li.selected {
+        background-color: #E31B69;
+    }
+</style>
+
+<script type="text/javascript">
+    var promotor_timeout = 5000;
+    var promotor_t;
+     
+    function promotor_next()
+    {
+        var current = $("#promotor > a:visible");
+        var next    = current.next("a");
+        
+        $("#promotor .promotor_controls li").removeClass("selected");
+        
+        if(!next.length){
+            next = $("#promotor > a:first");    
+            $("#promotor .promotor_controls li:first").addClass("selected");
+        } else {
+            $("#promotor .promotor_controls li").eq($("#promotor > a").index(next)).addClass("selected")
+        }
+                
+        $("#promotor > a").not(next).fadeOut();
+        next.fadeIn();
+        
+        promotor_t = setTimeout('promotor_next()', promotor_timeout);
+    }   
+    
+    $(document).ready(function(){
+        
+        if($("#promotor > a").length > 1) {          
+                        
+            $("#promotor > a").each(function(i){
+                if(i>0) {
+                    $(this).hide();
+                    $("#promotor .promotor_controls").append("<li></li>")
+                } else {
+                    $("#promotor .promotor_controls").append("<li class='selected'></li>")
+                }
+            });
+            promotor_t = setTimeout('promotor_next()', promotor_timeout);
+            
+            $("#promotor > a").hover(
+                function(){
+                    clearTimeout(promotor_t);
+                }, 
+                function(){
+                    promotor_t = setTimeout('promotor_next()', promotor_timeout);
+                }
+            )
+            
+            $("#promotor .promotor_controls li").live("click", function(){
+                clearTimeout(promotor_t);
+                
+                var index = $("#promotor .promotor_controls li").index($(this));
+                
+                $("#promotor > a").not(index).fadeOut();
+                $("#promotor > a").eq(index).fadeIn();
+                
+                $("#promotor .promotor_controls li").removeClass("selected");
+                $(this).addClass("selected");
+        
+                return false;
+            });
+        }
+    });
+    
+    
+</script>
+
+<div id="promotor">
+    <!-- BEGIN banner -->
+    <a href="{HREF}"><img src="{IMG_SRC}" {IMG_DIMENSIONS}></a>
+    <!-- END banner -->
+    <ul class="promotor_controls"></ul>
+</div>

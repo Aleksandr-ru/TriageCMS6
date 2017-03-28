@@ -1,0 +1,101 @@
+<style type="text/css">    
+    .t1 /*.active*/ .toggle img {
+        background: url('images/icons/16/lightbulb.png');
+    }
+    .t1 .inactive .toggle img {
+        background: url('images/icons/16/lightbulb_off.png');
+    }
+    .t1 .delete img {
+        background: url('images/icons/16/delete.png');
+    }
+    .t1 .inactive td {
+        background-color: #eee;
+    }
+    /*.t1 .image {
+        background: url('../plugins/{PLUGIN_UID}/images/transparency.gif');
+        border: solid 1px gray;
+    }*/
+    
+    .t1 .loading1 .toggle img {
+        background: url('images/icons/16/ajax-loader.gif') !important;
+    }
+    .t1 .loading2 .delete img {
+        background: url('images/icons/16/ajax-loader.gif') !important;
+    }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".t1 .toggle").click(function(){
+            
+            var tr = $(this).parents("tr");
+            if(tr.hasClass("loading1") || tr.hasClass("loading2")) return false;
+            
+            tr.toggleClass("loading1");
+            $.post("ajax/plugin.php?plugin_uid={PLUGIN_UID}&event=toggle", {banner_id: tr.find(".id").text()}, function(data){
+                if(data != 'OK') {
+                    alert(data);                    
+                }
+                else tr.toggleClass("inactive");
+                tr.toggleClass("loading1");
+            });
+            return false;
+        });
+        
+        $(".t1 .delete").click(function(){
+            
+            var tr = $(this).parents("tr");
+            if(tr.hasClass("loading1") || tr.hasClass("loading2")) return false;
+            
+            if(!confirm('Вы действительно хотите удалить этот баннер?')) return false;
+            
+            tr.toggleClass("loading2");
+            $.post("ajax/plugin.php?plugin_uid={PLUGIN_UID}&event=delete", {banner_id: tr.find(".id").text()}, function(data){
+                if(data != 'OK') {
+                    alert(data);
+                    tr.toggleClass("loading2");                    
+                }
+                else tr.remove();
+                
+            });
+            return false;
+        });
+    });
+</script>
+
+<h1>Промо баннеры ({NUM_ACTIVE} / {NUM_TOTAL})</h1>
+
+<p class="textlinks">
+    <img src="images/icons/16/add.png" align="absmiddle">
+    <a href="plugin.php?plugin_uid={PLUGIN_UID}&event=edit"> Добавить баннер</a>
+</p>
+
+<div>    
+    <table class="t1">
+    <tr>
+        <th>ID</th>
+        <th>Параметры</th>
+        <th>Баннер</th>
+    </tr>
+    <!-- BEGIN row -->
+    <tr class="{CLASS}">
+        <td align="center" valign="top">
+            <p class="id"><strong>{ID}</strong></p>
+            <p><a title="Редактировать" href="plugin.php?plugin_uid=promotor&event=edit&banner_id={ID}"><img src="images/icons/16/pencil.png"></a></p>
+            <p><a class="delete" title="Удалить" href="#"><img src="images/spacer.gif" width="16" height="16"></a></p>
+            <p><a class="toggle" title="Вкл./выкл." href="#"><img src="images/spacer.gif" width="16" height="16"></a></p>
+        </td>
+        <td valign="top">
+            <p>{NAME}</p>
+            <p><a target="_blank" href="{HREF}">{HREF}</a></p>
+            <p>Показов: {SHOWS}</p>
+            <p>Кликов: {CLICKS}</p>
+            <p>CTR: {CTR}%</p>
+        </td>
+        <td valign="top" class="image">
+            <a title="Редактировать" href="plugin.php?plugin_uid=promotor&event=edit&banner_id={ID}"><img src="{IMG_SRC}" {IMG_DIMENSIONS}></a>
+        </td>
+    </tr>
+    <!-- END row -->
+    </table>
+</div>

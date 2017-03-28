@@ -1,0 +1,108 @@
+<style type="text/css">
+    .t1 td { vertical-align: top; }
+    .t1 td div { margin: 2px 0; }
+    .t1 td .item_img { text-align: center; margin: 5px; }
+    .t1 td .item_img img { max-width: 150px; max-height: 150px; }
+    .t1 td input[type=text], .t1 td input[type=file], .t1 td textarea { width: 200px; }
+    .t1 td textarea { height: 3em; } 
+    .t1 td .href input { width: 170px; }
+    .t1 td .href button { padding: 0 5px; }
+    .plugin_head a { color: black; text-decoration: none; border-bottom: dashed 1px black; }
+</style>
+
+<script type="text/javascript">
+    
+    var browse_input = null;
+            
+    $(document).ready(function(){
+                
+        $(".t1 td span").click(function(){
+            var npt = $(this).prev("input[type=checkbox]");
+            npt.attr("checked", !npt.is(":checked"));
+        });
+        
+        $(".t1 td .href button").click(function(){
+            browse_input = $(this).prev("input");
+            var title = 'Страница';
+            var dlg = window.open('dialog.php?script=struct&callback=dlg_browse&title='+title, 'browse_page', 'width=500, height=500'); 
+            dlg.focus();
+            return false;
+        });
+        
+        $(".plugin_head .addnew").click(function(){
+            $(".plugin_body form input[name=addnew]").val(1);
+            $(".plugin_body form").submit();
+            return false;
+        });
+    });
+    
+    function dlg_browse(btn, params)
+    {        
+        if(!browse_input) return false;
+        
+        switch(btn)
+        {
+            case 'DLG_OK':
+            {
+                if(params.id && params.id > 0) {                    
+                    browse_input.val('#'+params.id+'#'+params.name);
+                }                
+            }
+            case 'DLG_CANCEL':
+            default:
+            
+        }
+        return true;
+    }
+</script>
+
+<div class="plugin_head">
+    <h1>
+        <a title="Назад" href="plugin.php?plugin_uid=taggeditems">{PLUGIN_TITLE}</a> / элементы в &quot;{LIST_NAME}&quot;
+    </h1> 
+    <img src="images/icons/16/page_white_add.png" align="absmiddle"> <a class="addnew" href="plugin.php?plugin_uid=taggeditems&event=new&list_id={LIST_ID}">Добавить новый элемент</a>
+</div>
+
+<div class="plugin_body">
+    <form method="post" action="plugin.php?plugin_uid=taggeditems&event=save" enctype="multipart/form-data">
+    <input type="hidden" name="list_id" value="{LIST_ID}">
+    <input type="hidden" name="list_material_id" value="{LIST_MATERIAL_ID}">
+    <input type="hidden" name="addnew" value="">
+        <table class="t1">
+        <tr>
+            <th>Элемент</th>
+            <!-- BEGIN groupping -->
+            <th>{GROUPPING_NAME}</th>
+            <!-- END groupping -->
+        </tr>
+        <!-- BEGIN item -->
+        <tr>
+            <td>
+                <input type="hidden" name="item_id[]" value="{ITEM_ID}">
+                <div class="item_img"><a target="_blank" href="{ITEM_HREF2}"><img src="{ITEM_IMG}"></a></div>
+                <div title="Название"><input type="text" name="item_name[{ITEM_ID}]" value="{ITEM_NAME}"></div>
+                <div title="Описание">                    
+                    <textarea class="visualExtbr" name="item_desc[{ITEM_ID}]">{ITEM_DESC}</textarea>
+                </div>
+                <div title="Ссылка" class="href">
+                    <input type="text" name="item_href[{ITEM_ID}]" value="{ITEM_HREF}"><button type="button" title="Выбрать страницу сайта"><img src="images/icons/16/page_find.png"></button>
+                </div>
+                <div title="Обновить изображение"><input type="file" name="item_file[{ITEM_ID}]"></div>
+                <div><input type="checkbox" name="del[]" value="{ITEM_ID}"> удалить элемент</p>
+            </td>
+            <!-- BEGIN groupping2 -->
+            <td title="{GROUPPING_NAME}">
+                <!-- BEGIN tag -->
+                <div><input type="checkbox" name="tags[{T_ITEM_ID}][]" value="{TAG_ID}" {TAG_CHK}> <span>{TAG_NAME}</span></div>
+                <!-- END tag -->
+            </td>
+            <!-- END groupping2 -->
+        </tr>
+        <!-- END item -->
+        </table>
+        
+        <p style="text-align: center;">
+            <input type="submit" value="Сохранить изменения" class="bigbutton">
+        </p>
+    </form>
+</div>

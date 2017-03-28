@@ -1,0 +1,156 @@
+<style type="text/css">
+    .plugin_head { padding: 20px; }
+    .plugin_head ul { margin: 0; padding: 0; list-style-type: none; }
+    .plugin_head ul li { float: left; margin: 0; padding: 0; width: 33%; text-align: center; }
+    .plugin_head input, .plugin_head select { font-size: 24px; }
+    .plugin_head p { font-size: 20px; margin-top: 5px; font-weight: normal; }
+    
+    td.controls, td.icons { white-space: nowrap; text-align: center; }
+    td.controls a, td.icons span { margin: 2px; padding: 2px; background-repeat: no-repeat; border: 0; }
+    
+    .controls a.edit { background-image: url('images/icons/16/pencil.png'); }
+    .controls a.delete { background-image: url('images/icons/16/delete.png'); }
+    .controls a.onoff { background-image: url('images/icons/16/lightbulb.png'); }
+    
+    .t1 .wait .controls a.delete { background-image: url('images/icons/16/ajax-loader.gif') !important; }
+    
+    .off td { background-color: #eee; }
+    .off .controls a.onoff { background-image: url('images/icons/16/lightbulb_off.png'); }
+    
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".t1 tr").mouseover(function(){ $(this).css("background-color", "#F0FAE8"); });
+        $(".t1 tr").mouseout(function(){ $(this).css("background-color", ""); });
+                
+        $("a.delete").click(function(){
+            var tr = $(this).parents("tr");
+            if(tr.hasClass("wait")) return false;
+            if((cnt = tr.find(".count").text()) > 0) {
+                alert('Нельзя удалить пока в этой группе есть '+cnt+' новостей!');
+                return false;
+            }
+            var grp_id = $(this).attr("group_id");
+            
+            if(confirm($(this).attr('title')+'?')) {
+                tr.addClass("wait");
+                $.post("ajax/plugin.php?plugin_uid=news&event=delgroup", {group_id: grp_id}, function(data){
+                    if(data != 'OK') {
+                        alert(data);
+                        tr.removeClass("wait");    
+                    }
+                    else tr.remove();
+                });
+            }
+            return false;
+        });
+        
+        $("a.edit").click(function(){
+            var grp_id = $(this).attr("group_id");
+            var new_name = prompt('Введите новое название группы:', $(this).parents("tr").find("td.name").text());
+            
+            if(typeof(new_name) == 'string' && new_name != '')
+            {
+                $.post("ajax/plugin.php?plugin_uid=news&event=editgroup", {group_id: grp_id, name: new_name}, function(data){
+                    if(data != 'OK')
+                    {
+                        alert(data);
+                        return false;
+                    }
+                    window.location.reload();
+                });
+            }
+            
+            return false;
+        });
+        
+        $("a.onoff").click(function(){
+            var tr = $(this).parents("tr");
+            if(tr.hasClass("wait")) return false;
+            var grp_id = $(this).attr("group_id");
+                        
+            $.post("ajax/plugin.php?plugin_uid=news&event=grouponoff", {group_id: grp_id, off: tr.hasClass("off") ? 0 : 1}, function(data){
+                if(data != 'OK') {
+                    alert(data);                    
+                }
+                else tr.toggleClass("off");
+            });
+            
+            return false;
+        });
+        
+        $("input.rss").click(function(){
+            var tr = $(this).parents("tr");
+            if(tr.hasClass("wait")) return false;
+            var grp_id = $(this).attr("group_id");
+                        
+            $.post("ajax/plugin.php?plugin_uid=news&event=grouprss", {group_id: grp_id, rss: $(this).is(":checked") ? 1 : 0}, function(data){
+                if(data != 'OK') {
+                    alert(data); 
+                    tr.find("input.rss").attr("checked", !$(this).is(":checked"));                   
+                }
+                else return ;
+            });
+        });
+        
+        $("a.add").click(function(){
+            var new_name = prompt('Введите название новой группы:', 'новая группа');
+            
+            if(typeof(new_name) == 'string' && new_name != '')
+            {
+                $.post("ajax/plugin.php?plugin_uid=news&event=addgroup", {name: new_name}, function(data){
+                    if(data != 'OK')
+                    {
+                        alert(data);
+                        return false;
+                    }
+                    window.location.reload();
+                });
+            }
+            
+            return false;
+        });
+        
+    });
+</script>
+
+<div class="plugin_head">
+    <ul>
+        <li><input type="button" value="&larr; назад" onclick="window.location.href='plugin.php?plugin_uid=news';"></li>
+        <li style="text-align: left; width: 66%;">
+            <p><strong>Группы новостей</strong></p>
+        </li>
+    </ul>
+    <div class="clear"></div>
+</div>
+
+<div>
+    <table class="t1">
+    <tr>
+        <th>ID</th>
+        <th>Название</th>        
+        <th>Кол-во новостей</th>
+        <th title="Новости могут присутствовать в RSS ленте">RSS</th>        
+        <th>Действия</th>
+    </tr>
+    <!-- BEGIN row -->
+    <tr class="{IS_RSS} {ONOFF}">
+        <td class="center">{GROUP_ID}</td>
+        <td class="name">{GROUP_NAME}</td>
+        <td class="center count">{GROUP_CNT}</td>
+        <td class="center">
+            <input class="rss" type="checkbox" group_id="{GROUP_ID}" {RSS_CHK}>
+        </td>        
+        <td class="controls">
+            <a class="onoff" group_id="{GROUP_ID}" title="Включить/выключить" href="#onoff"><img src="images/spacer.gif" width="16" height="16"></a>
+            <a class="edit" group_id="{GROUP_ID}" title="Редактировать название" href="#editgroup"><img src="images/spacer.gif" width="16" height="16"></a>
+            <a class="delete" group_id="{GROUP_ID}" title="Удалить группу" href="#delgroup"><img src="images/spacer.gif" width="16" height="16"></a>            
+        </td>
+    </tr>
+    <!-- END row -->
+    <tr>
+        <td colspan="5" class="textlinks"><a class="add" href="#addgroup">Добавить новую группу новостей</a></td>
+    </tr>
+    </table>
+</div>

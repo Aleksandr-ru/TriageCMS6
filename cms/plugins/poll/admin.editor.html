@@ -1,0 +1,97 @@
+<style type="text/css">
+    .plugin_head ul { margin: 0; padding: 0; list-style-type: none; }
+    .plugin_head ul li { float: left; margin: 0; padding: 0; width: 33%; text-align: center; }
+    .plugin_head h1 { margin-top: 5px; font-weight: normal; }
+    
+    .plugin_body { width: 700px; }
+    .plugin_body ul { list-style-type: none; }
+    .plugin_body ul li { list-style-type: none; padding: 2px 0; }
+    .plugin_body ul li label { float: left; width: 15em; padding-top: 4px; }
+    .plugin_body ul li img { vertical-align: middle; }    
+    .addvote a { color: blue; text-decoration: none; border-bottom: dashed 1px blue; margin-left: 15px; }   
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".addvote a").click(function(){
+            $(".votes").append( $("#add_vote_html").html() );
+            return false;
+        });
+        
+        $(".vote a.del").live("click", function(){            
+            var li = $(this).parent("li");            
+            if(li.find("input.vote_id").val()) {
+                if(confirm("Удалить немедленно и безвозвратно?")) {
+                    li.addClass("loading");
+                    $.post($(this).attr("href"), {}, function(data){                
+                        if(data != 'OK') alert(data);
+                        else li.remove();
+                    });
+                }      
+            } else {
+                li.remove();           
+            }
+            return false;
+        });
+        
+        $(".vote input[type=radio]").live("click", function(){
+            var idx = $(".vote input[type=radio]").index($(this));
+            $("input[name=vote_fake_idx]").val(idx);
+        });
+        
+        $("input[name=vote_fake_idx]").val( $(".vote input[type=radio]").index($(".vote input[type=radio]:checked")) );
+    });
+</script>
+
+<div class="plugin_head">
+    <ul>
+        <li><input type="button" value="&larr; назад" onclick="window.location.href='plugin.php?plugin_uid=poll';"></li>
+        <li style="text-align: left; width: 66%;">
+            <h1>Редактирование опроса</h1>
+        </li>
+    </ul>
+    <div class="clear"></div>
+</div>
+
+<div class="plugin_body">
+    <form method="post" action="?plugin_uid=poll&event=save">
+    <input type="hidden" name="poll_id" value="{POLL_ID}">
+    <input type="hidden" name="vote_fake_idx" value="">
+        <ul>
+            <li><label>ID опроса</label> <input type="text" value="{ID_TEXT}" disabled="disabled" size="6"></li>
+            <li><label>Название</label> <input type="text" name="poll_name" value="{POLL_NAME}" size="40"></li>
+            <li><label>Описание</label> <textarea name="poll_desc" rows="3" cols="40">{POLL_DESC}</textarea></li>
+            <li><label>Разрешить искажение</label> <input type="text" name="fake_percent" value="{FAKE_PERCENT}" size="3" maxlength="2"> %</li>
+            <li><label>Искажать после</label> <input type="text" name="fake_threshold" value="{fake_threshold}" size="4"> голосов в сумме</li>
+            <li><label>Варианты ответов</label> &nbsp;
+                <div class="clear"></div>
+                <ul class="votes">
+                    <!-- BEGIN vote -->
+                    <li class="vote">
+                        <input type="hidden" name="vote_id[]" value="{VOTE_ID}" class="vote_id">
+                        № <input type="text" name="vote_order[]" value="{VOTE_ORDER}" size="3" title="Порядок сортировки">
+                        <input type="text" name="vote_name[]" value="{VOTE_NAME}" title="Название" size="30">
+                        <input type="radio" name="vote_fake_chk" value="{VOTE_ID}" title="Искажать этот вариант ответа" {FAKE_CHK}>
+                        <a class="del" href="ajax/plugin.php?plugin_uid=poll&event=delvote&vote_id={VOTE_ID}" title="Удалить"><img src="images/icons/16/delete.png"></a>
+                    </li>
+                    <!-- END vote -->                    
+                </ul>
+                <p class="addvote"><a href="#">Добавить вариант ответа</a></p>
+            </li>
+        </ul>
+        <div class="center">
+            <input type="submit" value="Сохранить опрос" class="bigbutton">
+        </div>
+    </form>
+    <div class="hidden" id="add_vote_html">
+        <li class="vote">
+            <input type="hidden" name="vote_id[]" value="" class="vote_id">
+            № <input type="text" name="vote_order[]" value="" size="3" title="Порядок сортировки">
+            <input type="text" name="vote_name[]" value="" title="Название" size="30">
+            <input type="radio" name="vote_fake_chk" value="" title="Искажать этот вариант ответа">
+            <a class="del" href="#" title="Удалить"><img src="images/icons/16/delete.png"></a>
+        </li>
+    </div>
+</div>
+
+<div class="plugin_foot"></div>

@@ -1,0 +1,14 @@
+<div class="poll">
+    <form method="post" action="">
+        <input type="hidden" name="poll_id" value="{POLL_ID}">
+        <big>{POLL_NAME}</big>
+        <p>{POLL_DESC}</p>
+        <ul>
+            <!-- BEGIN vote -->
+            <li><input type="radio" name="vote_id" value="{VOTE_ID}"> {VOTE_NAME}</li>
+            <!-- END vote -->
+        </ul>
+        <p><input type="submit" name="pollvote" value="Голосовать"></p>
+        <p><a href="{RESULTS_HREF}">Результаты</a></p>        
+    </form>
+</div>

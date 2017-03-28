@@ -1,0 +1,43 @@
+<style type="text/css">
+    ul.news_groups { padding-left: 14em; margin: 0; margin-left: 1em; }
+    ul.news_groups li { float: left; clear: none; margin: 0; padding: 2px; white-space: nowrap; }
+    .news_short { width: 70%; height: 4em; }
+    ul.news_groups li.hidden { color: gray; }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        // всегда переводим фокус на ввод HTML
+        $("#a_html").click();
+        // и убираем недопустимые типы материалов
+        $("#a_text, #a_css, #a_javascript, #a_plugin").remove();
+        
+        $("#news_pic_file_select").focus(function(){
+            var material_id = $("input[name='material_id']").val();
+            if(material_id){
+                $("#news_pic_file_select").load("ajax/plugin.php?plugin_uid=news&event=picture_options", {material_id: material_id, sel_id: $("#news_pic_file_select").val()});    
+            } 
+        });
+    });
+</script>
+
+<ul>    
+    <li><label>ID новости:</label> <strong>{NEWS_ID_TEXT}</strong><input type="hidden" name="news_id" value="{NEWS_ID}"></li>
+    <li><label>Дата новости:</label> <input type="text" name="news_date" value="{NEWS_DATE}" style="width: 12em;"> <input type="button" value="&larr; сегодня"></li>
+    <li>
+        <label>Группы:</label> 
+        <ul class="news_groups">
+            <!-- BEGIN group -->
+            <li class="{GROUP_CLASS}"><input type="checkbox" name="news_groups[]" value="{GROUP_ID}" {GROUP_CHK}> {GROUP_NAME}</li>
+            <!-- END group -->
+        </ul>
+        &nbsp;
+    </li>
+    <li><label>Изображение:</label>
+        <select name="pic_file_id" id="news_pic_file_select">
+            <option value="0">(не выбрано)</option>
+            {PIC_OPTIONS}
+        </select>
+    </li>
+    <li><label>Короткий текст/RSS:</label> <textarea class="news_short" name="news_short">{NEWS_SHORT}</textarea></li>
+</ul>

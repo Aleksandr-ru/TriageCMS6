@@ -1,0 +1,22 @@
+<div class="news_archive">
+    <h1>Архив новостей {YEAR} / {GROUP}</h1>
+    <ul class="years">
+        <!-- BEGIN years -->
+        <li class="{YEAR_SEL}"><a href="{YEAR_HREF}">{YEAR_VAL}</a> ({YEAR_CNT})</li>
+        <!-- END years -->
+    </ul>
+    <select onchange="window.location.href=this.options[this.selectedIndex].getAttribute('href');">        
+        <!-- BEGIN groups -->
+        <option value="{GROUP_ID}" href="{GROUP_HREF}" {GROUP_SEL}>{GROUP_NAME} ({GROUP_CNT})</option>
+        <!-- END groups -->
+    </select>
+    
+    <!-- BEGIN news -->
+    <div class="news-row" id="news-row-{NEWS_ID}">
+        <p><big>{NEWS_TITLE}</big> {NEWS_DATE}</p>
+        <p>{NEWS_IMG} {NEWS_SHORT} <a href="{NEWS_HREF}">подробнее</a></p>
+    </div>
+    <!-- END news -->
+    
+    <p><a href="{RSS_LINK}">RSS</a></p>
+</div>

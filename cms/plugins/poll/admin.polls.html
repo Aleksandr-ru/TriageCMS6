@@ -1,0 +1,66 @@
+<style type="text/css">
+    .plugin_head { margin: 1em; text-align: center; }
+    .plugin_head input { font-size: 24px; }
+    .actions { vertical-align: top; }
+    .actions a { display: block; margin: 10px 5px; }
+    a.onoff { background: url('images/icons/16/lightbulb.png') center center no-repeat; }
+    a.edit { background: url('images/icons/16/pencil.png') center center no-repeat; }
+    .inactive, .inactive td { background-color: #eee; }
+    .inactive a.onoff { background-image: url('images/icons/16/lightbulb_off.png'); }
+    
+    .vote_cnt, .vote_percent { text-align: right; }
+    .vote_cnt { font-weight: bold; }
+    .fake { font-style: italic; }
+    
+    .t1 td { vertical-align: top; }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".t1 a.onoff").click(function(){
+            var tr = $(this).parents("tr");
+            $.post($(this).attr("href"), {off: tr.hasClass("inactive") ? 0 : 1}, function(data){                
+                if(data != 'OK') alert(data);
+                else tr.toggleClass("inactive");
+            });            
+            return false;
+        });
+    });
+</script>
+
+<div class="plugin_head">
+    <input type="button" value="Создать новый опрос" onclick="window.location.href='?plugin_uid=poll&event=edit';">
+</div>
+
+<table class="t1">
+<tr>
+    <th>Опрос</th>
+    <th>Результаты без искажения</th>
+    <th>&nbsp;</th>
+</tr>
+<!-- BEGIN row -->
+<tr class="{INACTIVE}">
+    <td>
+        <p><big>{POLL_NAME}</big></p>
+        <p>{POLL_DESC}</p>
+        <p>Искажение: {FAKE_TEXT}</p>
+    </td>
+    <td>
+        <table class="t2" width="100%">
+        <!-- BEGIN vote -->
+        <tr class="{FAKE}">
+            <td>{VOTE_NAME}</td>
+            <td class="vote_cnt">{VOTE_CNT}</td>
+            <td class="vote_percent">{VOTE_PERCENT}%</td>
+        </tr>
+        <!-- END vote -->
+        </table>
+        <p>Всего проголосовало: <strong>{POLL_SUM}</strong></p>
+    </td>
+    <td class="actions">
+        <a class="onoff" href="ajax/plugin.php?plugin_uid=poll&event=onoff&poll_id={POLL_ID}" title="Включить/выключить"><img src="images/spacer.gif" width="16" height="16"></a>
+        <a class="edit" href="?plugin_uid=poll&event=edit&poll_id={POLL_ID}" title="Редактировать"><img src="images/spacer.gif" width="16" height="16"></a>
+    </td>
+</tr>
+<!-- END row -->
+</table>

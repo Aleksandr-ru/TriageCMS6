@@ -1,0 +1,127 @@
+<style type="text/css">
+    .taggeditems_src { display: none; }
+    .taggeditems .tag { display: none; }
+    
+    .taggeditems .ti-checks, .taggeditems .ti-checks li { list-style-type: none; margin: 0; padding: 0; }
+    .taggeditems .ti-checks { text-align: right; }
+    .taggeditems .ti-checks li { display: inline-block; margin-left: 1em; }
+    .taggeditems .ti-checks li span { border-bottom: dashed 1px black; cursor: pointer; }
+    
+    .taggeditems .ti-groups, .taggeditems .ti-groups li { list-style-type: none; margin: 0; padding: 0; }
+    .taggeditems .ti-groups { width: 100%; margin: 1em 0; }
+    .taggeditems .ti-groups li { clear: both; display: block; width: 100%; }
+    .taggeditems .ti-groups li .group-name {  float: left; width: 150px; font-weight: bold; }
+    .taggeditems .ti-groups li .item { float: left; width: 100px; margin: 2px 5px; text-align: center; }
+    .taggeditems .ti-groups li .item img { max-width: 50px; }
+    
+    .taggeditems .grayed { color: gray; filter:alpha(opacity=50); -moz-opacity: 0.5; -khtml-opacity: 0.5; opacity: 0.5; }
+    .taggeditems .grayed img { filter:alpha(opacity=50); -moz-opacity: 0.5; -khtml-opacity: 0.5; opacity: 0.5; }
+    
+    .taggeditems .item_desc { display: none; }
+    
+    .taggeditems .clone { display: none; position: absolute; background: white; border: solid 1px #ccc; border-radius: 15px; z-index: 1001; }
+    .taggeditems .clone .item { margin: 15px; text-align: center; }
+    .taggeditems .clone .item .item_name { font-weight: bold; }
+    .taggeditems .clone .item .item_desc { display: block; }
+</style>
+
+<script type="text/javascript" src="cms/scripts/jquery.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        convert_ti();
+        
+        $(".taggeditems .ti-checks input[type=checkbox]").live("click", function(){            
+            var tags = new Array();
+            $(".taggeditems .ti-checks input[type=checkbox]:checked").each(function(){ tags.push($(this).val()); });
+            $(".taggeditems .item").removeClass("grayed");
+            if(tags.length > 0) $(".taggeditems .item").each(function(){                
+                var match = 0;                
+                for(var i in tags) {                    
+                    if($(this).children("div.tag[tag_id="+tags[i]+"]").length) {
+                        match++;
+                    }    
+                }
+                if(match != tags.length) $(this).addClass("grayed");
+            });
+        });
+        
+        $(".taggeditems .ti-checks li span").click(function(){
+            //var npt = $(this).prev("input[type=checkbox]");
+            //npt.attr("checked", !npt.is(":checked"));
+            $(this).prev("input[type=checkbox]").click();
+        });
+        
+        $(".taggeditems .ti-groups .item a").live("click", function(){
+            var clone = $(".taggeditems .clone");
+            if(clone.is(":animated")) return false;
+            clone.hide();
+            var item = $(this).parents(".item");
+            if(!item.hasClass("grayed")) {
+                clone.html( "<div class='item'>"+item.html()+"</div>" );
+                var xx = Math.round((clone.outerWidth() - item.outerWidth()) / 3, 0);
+                var yy = Math.round((clone.outerHeight() - item.outerHeight()) / 3, 0);
+                var left = item.position().left;
+                var top = item.position().top;
+                clone.css("left", left).css("top", top).show("fast").animate({left: left-xx, top: top-yy}, "fast");
+            }
+            return false;
+        });
+        
+        $(".taggeditems").click(function(){
+            var clone = $(".taggeditems .clone");
+            if(clone.is(":animated")) return false;
+            clone.fadeOut("fast");
+        });
+    });
+    
+    function convert_ti()
+    {        
+        var ul = $("<ul class='ti-checks'></ul>").appendTo(".taggeditems");
+        $(".taggeditems_src .groupping:eq(1) .tag").each(function(){                        
+            var tag_id = $(this).find("input[type=checkbox]").val();            
+            var li = $("<li>"+$(this).html()+"</li>").appendTo(ul);            
+        });
+        
+        var ul = $("<ul class='ti-groups'></ul>").appendTo(".taggeditems");        
+        $(".taggeditems_src .groupping:first .tag").each(function(){                        
+            var tag_id = $(this).find("input[type=checkbox]").val();            
+            var li = $("<li><span class='group-name'>"+$(this).text()+"</span></li>").appendTo(ul);
+            
+            $(".taggeditems_src .items .item").each(function(){
+                if($(this).children("div.tag[tag_id="+tag_id+"]").length) {
+                    li.append($(this).clone());
+                }
+            });
+        });
+    }
+</script>
+
+<h1>{LIST_NAME} <!-- {LIST_ID} --></h1>
+<div>{LIST_DESC}</div>
+
+<div class="taggeditems_src">
+    <!-- BEGIN groupping -->
+    <div class="groupping" title="{GROUPPING_NAME}" groupping_id="{GROUPPING_ID}">
+        <!-- BEGIN tag -->
+        <div class="tag"><input type="checkbox" value="{TAG_ID}"> <span>{TAG_NAME}</span></div>
+        <!-- END tag -->
+    </div>
+    <!-- END groupping -->
+    
+    <div class="items">
+        <!-- BEGIN item -->
+        <div class="item" item_id="{ITEM_ID}">
+            <div class="item_img"><a href="{ITEM_HREF}"><img src="{ITEM_IMG}"></a></div>
+            <div class="item_name">{ITEM_NAME}</div>
+            <div class="item_desc">{ITEM_DESC}</div>
+            <!-- BEGIN item_tag -->
+            <div class="tag" tag_id="{ITAG_ID}" item_id="{ITAG_ITEM_ID}">{ITAG_NAME}</div>
+            <!-- END item_tag -->
+        </div>
+        <!-- END item -->
+    </div>
+</div>
+
+<div class="taggeditems">
+    <div class="clone"></div>
+</div>

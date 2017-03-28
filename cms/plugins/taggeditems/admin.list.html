@@ -1,0 +1,198 @@
+<style type="text/css">
+    .ti { width: 100%; }
+    .ti > div { width: 33%; float: left; }
+    .ti div p { margin-left: 1em; border-bottom: dotted 1px #ccc; font-weight: bold; padding-bottom: 4px; }
+    .ti div div { margin: 1em; }
+    .ti div div img { vertical-align: middle; }
+    .ti div div a { color: black; text-decoration: none; border-bottom: dashed 1px black; }
+    .ti div ul, .ti div ul li { list-style-type: none; margin: 0; padding: 0; }
+    .ti div ul { margin: 1em; }
+    .ti div ul li { display: block; padding: 0.5em; cursor: pointer; }    
+    .ti div ul li a { color: black; text-decoration: none; }    
+    .ti div ul li span { float: right; margin-right: 1em; visibility: hidden; }    
+    .ti div ul li.hover { background-color: #f4f4f4; border-radius: 0 15px 15px 0; }
+    .ti div ul li.hover span { visibility: visible; }            
+    .ti div ul li.selected { background-color: #eee; border-radius: 0 15px 15px 0; }
+    .ti div ul li.disabled a { color: gray; }
+</style>
+
+<script type="text/javascript">
+    var curr_list_id = 0;
+    var curr_grp_id = 0;
+    var curr_tag_id = 0;
+    
+    $(document).ready(function(){
+        reload_lists();
+        
+        $(".ti div ul li").live("mouseover", function(){ $(this).addClass("hover"); });
+        $(".ti div ul li").live("mouseout", function(){ $(this).removeClass("hover"); });
+        
+        $(".ti div ul li > a").live("click", function(){
+            $(this).parents("ul").children("li").removeClass("selected");
+            $(this).parents("li").addClass("selected");
+            
+            switch($(this).parents("div").get(0).className) {
+                case "lists":
+                    curr_list_id = $(this).parents("li").attr("list_id");
+                    reload_grouppings();
+                    break;
+                case "grouppings":
+                    curr_grp_id = $(this).parents("li").attr("groupping_id");
+                    reload_tags();
+                    break;
+                case "tags":
+                    curr_tag_id = $(this).parents("li").attr("tag_id");                    
+                    //alert(curr_tag_id);
+                    break;
+            }            
+            return false;    
+        });
+        
+        $(".ti div ul li").live("click", function(){
+            $(this).children("a:first").click();    
+        });
+        
+        $("a.addgrp").click(function(){
+            if(!curr_list_id) {
+                alert("Выберите список!");
+                return false;
+            }
+            var new_name = prompt('Введите название группировки:', 'Новая группировка');
+            if(typeof(new_name) == 'string' && new_name != '') {
+                $.post("ajax/plugin.php?plugin_uid=taggeditems&event=addgroupping", {name: new_name, list_id: curr_list_id}, function(data){
+                    if(data != 'OK') alert(data);
+                    else reload_grouppings();
+                });
+            }
+            return false;
+        });
+        
+        $("a.addtag").click(function(){
+            if(!curr_grp_id) {
+                alert("Выберите группировку!");
+                return false;
+            }
+            var new_name = prompt('Введите название тэга:', 'Новый тэг');
+            if(typeof(new_name) == 'string' && new_name != '') {
+                $.post("ajax/plugin.php?plugin_uid=taggeditems&event=addtag", {name: new_name, groupping_id: curr_grp_id}, function(data){
+                    if(data != 'OK') alert(data);
+                    else reload_tags();
+                });
+            }
+            return false;
+        });
+        
+        $("a.editgrp").live("click", function(){
+            var grp_id = $(this).parents("li").attr("groupping_id");
+            if(!grp_id) return false;
+            var old_name = $(this).parents("li").children("a:first").text();
+            
+            var new_name = prompt('Введите название группировки:', old_name);
+            if(typeof(new_name) == 'string' && new_name != '' && new_name != old_name) {
+                $.post("ajax/plugin.php?plugin_uid=taggeditems&event=editgroupping", {name: new_name, groupping_id: grp_id}, function(data){
+                    if(data != 'OK') alert(data);
+                    else reload_grouppings();
+                });
+            }
+            return false;
+        });
+        
+        $("a.edittag").live("click", function(){
+            var tag_id = $(this).parents("li").attr("tag_id");
+            if(!tag_id) return false;
+            var old_name = $(this).parents("li").children("a:first").text();
+            
+            var new_name = prompt('Введите название тэга:', old_name);
+            if(typeof(new_name) == 'string' && new_name != '' && new_name != old_name) {
+                $.post("ajax/plugin.php?plugin_uid=taggeditems&event=edittag", {name: new_name, tag_id: tag_id}, function(data){
+                    if(data != 'OK') alert(data);
+                    else reload_tags();
+                });
+            }
+            return false;
+        });
+        
+        $("a.deltag").live("click", function(){
+            var tag_id = $(this).parents("li").attr("tag_id");
+            if(!tag_id) return false;
+            var old_name = $(this).parents("li").children("a:first").text();
+                        
+            if(confirm("Удалить '"+old_name+"'?")) {
+                $.post("ajax/plugin.php?plugin_uid=taggeditems&event=deltag", {tag_id: tag_id}, function(data){
+                    if(data != 'OK') alert(data);
+                    else reload_tags();
+                });
+            }
+            return false;
+        });
+        
+        $("a.delgrp").live("click", function(){
+            var grp_id = $(this).parents("li").attr("groupping_id");
+            if(!grp_id) return false;
+            var old_name = $(this).parents("li").children("a:first").text();
+                        
+            if(confirm("Удалить '"+old_name+"'?")) {
+                $.post("ajax/plugin.php?plugin_uid=taggeditems&event=delgroupping", {groupping_id: grp_id}, function(data){
+                    if(data != 'OK') alert(data);
+                    else reload_grouppings();
+                });
+            }
+            return false;
+        });
+    });
+    
+    function reload_lists()
+    {
+        $(".ti .lists ul").html('<img src="images/ajax-loader.gif">').load('ajax/plugin.php?plugin_uid=taggeditems&event=lists');
+        $(".ti .grouppings ul").html('');
+        $(".ti .tags ul").html('');
+        curr_list_id = 0;
+        curr_grp_id = 0;
+        curr_tag_id = 0;
+    }
+    
+    function reload_grouppings()
+    {
+        if(!curr_list_id) {
+            alert("Выберите список!");
+            return false;
+        }
+        $(".ti .grouppings ul").html('<img src="images/ajax-loader.gif">').load('ajax/plugin.php?plugin_uid=taggeditems&event=grouppings&list_id='+curr_list_id); 
+        $(".ti .tags ul").html('');        
+        curr_grp_id = 0;
+        curr_tag_id = 0;
+    }
+    
+    function reload_tags()
+    {
+        if(!curr_grp_id) {
+            alert("Выберите группировку!");
+            return false;
+        }        
+        $(".ti .tags ul").html('<img src="images/ajax-loader.gif">').load('ajax/plugin.php?plugin_uid=taggeditems&event=tags&groupping_id='+curr_grp_id);        
+        curr_tag_id = 0;
+    }
+</script>
+
+<div class="plugin_head">
+    <h1>{PLUGIN_TITLE}</h1>
+</div>
+
+<div class="ti">
+    <div class="lists">
+        <p>Списки</p>
+        <ul></ul>             
+        <div><img src="images/icons/16/page_white_add.png"> <a href="material.php?plugin_uid=taggeditems&group_id={GROUP_ID}" class="addlist">Добавить список</a></div>
+    </div>
+    <div class="grouppings">
+        <p>Группировки</p>
+        <ul></ul>    
+        <div><img src="images/icons/16/book_add.png"> <a href="#" class="addgrp">Добавить группировку</a></div>
+    </div>
+    <div class="tags">
+        <p>Тэги</p>
+        <ul></ul>    
+        <div><img src="../plugins/taggeditems/images/tag_blue_add.png"> <a href="#" class="addtag">Добавить тэг</a></div>
+    </div>
+</div>
+<div class="clear"></div>

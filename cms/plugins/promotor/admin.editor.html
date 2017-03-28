@@ -1,0 +1,110 @@
+<style type="text/css">
+    #promotor h1 {
+        text-align: center;
+    }
+    #promotor ul, #promotor ul li {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+    }
+    #promotor ul {
+        display: block;
+        position: relative;
+        margin: 1em 0;
+        width: 500px;
+        left: 50%;
+        margin-left: -250px;
+    }
+    #promotor ul li {
+        margin: 1em 0;
+    }
+    #promotor ul li label {
+        display: inline-block;
+        width: 8em;
+    }
+    #promotor ul li input[type=text], #promotor ul li input[type=file] {
+        width: 25em;
+    }
+    #promotor .image {
+        text-align: center;
+        margin: 1em;
+    }
+    #promotor .image img {
+        border: solid 1px #ccc;
+        background: url('../plugins/{PLUGIN_UID}/images/transparency.gif');
+    }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+        $("#browse_href").click(function(){
+            var title = 'Выбор страницы';
+            var reg = new RegExp('^#([0-9]+)#')
+            var page_id = '';
+            if(arr = reg.exec($("#href").val())) {
+                page_id = arr[1];
+            }
+            var dlg = window.open('dialog.php?script=struct&callback=dlg_href&page_id='+page_id+'&title='+title, 'parent', 'width=500, height=500'); 
+            dlg.focus();
+            return false;
+        });
+        
+    });
+    
+    function dlg_href(btn, params)
+    {        
+        switch(btn)
+        {
+            case 'DLG_OK':
+            {
+                if(params.id && params.id > 0)
+                {
+                    //$("#redirect-id").val(params.id);
+                    $("#href").val("#"+params.id+"#"+params.name);
+                }                
+            }
+            case 'DLG_CANCEL':
+            default:
+            
+        }
+        return true;
+    }
+</script>
+
+<!-- {PLUGIN_UID} -->
+
+<form id="promotor" method="post" action="plugin.php?plugin_uid={PLUGIN_UID}&event=save" enctype="multipart/form-data">
+    <h1>Редактирование баннера</h1>
+    
+    <input type="hidden" name="promotor_id" value="{ID}">
+    <ul>
+        <li>
+            <label>ID</label> 
+            <strong>{ID_TEXT}</strong>
+        </li>
+        <li>
+            <label>Название</label>
+            <input type="text" name="promotor_name" value="{NAME}">
+        </li>
+        <li>
+            <label>Ссылка</label>
+            <input type="text" name="promotor_href" value="{HREF}" id="href">
+            <a title="Выбрать страницу" id="browse_href" href="#">
+                <img src="images/icons/16/page_find.png" width="16" height="16" border="0" align="absmiddle">
+            </a>
+        </li>
+        <li>
+            <label>Загрузить файл</label>
+            <input type="file" name="userfile">
+        </li>
+        <li>
+            <label>&nbsp;</label>
+            <input type="submit" value="Сохранить">
+            <input type="reset" value="Отмена" onclick="window.location.href='plugin.php?plugin_uid={PLUGIN_UID}';">
+        </li>
+    </ul>
+    <!-- BEGIN img -->
+    <div class="image"><img src="{IMG_SRC}" {IMG_DIMENSIONS}></div>
+    <!-- END img -->        
+</form>

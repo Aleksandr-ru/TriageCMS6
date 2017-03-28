@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+>
+
+<channel>
+	<title>{CHANNEL_TITLE}</title>
+	<atom:link href="{RSS_LINK}" rel="self" type="application/rss+xml" />
+	<link>{PAGE_LINK}</link>
+	<description>{CHANNEL_DESCRIPTION}</description>
+	<lastBuildDate>{LASTBUILD_DATE}</lastBuildDate>
+	<language>ru-ru</language>
+	<generator>Triage CMS, Bloggy plugin</generator>
+	
+    <!-- BEGIN item -->
+    <item>
+    	<title>{ITEM_TITLE}</title>
+    	<link>{ITEM_LINK}</link>
+    	<pubDate>{ITEM_PUBDATE}</pubDate>
+    	<!-- BEGIN category -->
+        <category><![CDATA[{CATEGORY_NAME}]]></category>
+        <!-- END category -->
+    	<guid>{ITEM_LINK}</guid>
+    	<description><![CDATA[{ITEM_DESCRIPTION}]]></description>
+   		<content:encoded><![CDATA[{ITEM_HTML}]]></content:encoded>
+	</item>
+    <!-- END item -->    
+      
+</channel>
+</rss>
