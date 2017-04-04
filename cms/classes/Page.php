@@ -144,7 +144,8 @@ class Page
         $page_variables = array_keys($tpl->blockvariables['__global__']);        
         
         //$sql = "SELECT * FROM (SELECT var.name, var.material_id, mat.type, mat.data, mat.access_group FROM ".$DB->T('_variables')." AS var JOIN ".$DB->T('_material')." AS mat ON mat.id = var.material_id WHERE(var.page_id=".$DB->F($this->id())." OR var.page_id=0) ORDER BY var.page_id DESC) AS v GROUP BY v.name";
-        $sql = "SELECT * FROM (SELECT var.name, var.material_id, mat.access_group FROM ".$DB->T('_variables')." AS var JOIN ".$DB->T('_material')." AS mat ON mat.id = var.material_id WHERE(var.page_id=".$DB->F($this->id())." OR var.page_id=0) ORDER BY var.page_id DESC) AS v GROUP BY v.name";
+        //$sql = "SELECT * FROM (SELECT var.name, var.material_id, mat.access_group FROM ".$DB->T('_variables')." AS var JOIN ".$DB->T('_material')." AS mat ON mat.id = var.material_id WHERE(var.page_id=".$DB->F($this->id())." OR var.page_id=0) ORDER BY var.page_id DESC) AS v GROUP BY v.name";
+	$sql = "SELECT var.name, IFNULL(MAX(IF(var.page_id>0,var.material_id,NULL)),var.material_id) AS material_id, mat.access_group FROM ".$DB->T('_variables')." AS var JOIN ".$DB->T('_material')." AS mat ON mat.id=var.material_id WHERE var.page_id IN (".$DB->F($this->id()).",0) GROUP BY var.name";
         $result = $DB->query($sql);
 
         //while(list($variable_name, $material_id, $material_type, $material_data, $material_access_group) = $DB->fetch(false, false, $result)) {
