@@ -8,7 +8,7 @@
  * @copyright 2010
  */
 
-define('CMS_VERSION', '6.2.a');
+define('CMS_VERSION', '6.2.b');
 
 @ini_set('magic_quotes_gpc', 0);
 	
